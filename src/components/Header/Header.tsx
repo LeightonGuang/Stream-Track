@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import "./Header.scss";
 
 export default function Header() {
@@ -8,18 +8,21 @@ export default function Header() {
         <h1 className="header__title">Stream Track</h1>
         <nav className="header__nav">
           <ul className="header__list">
-            <Link to={"/"} className="header__link header__link--all">
+            <NavLink to={"/"} className="header__link header__link--all">
               All
-            </Link>
-            <Link to={"/twitch"} className="header__link header__link--twitch">
+            </NavLink>
+            <NavLink
+              to={"/twitch"}
+              className="header__link header__link--twitch"
+            >
               Twitch
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               to={"/youtube"}
               className="header__link header__link--youtube"
             >
               Youtube
-            </Link>
+            </NavLink>
           </ul>
         </nav>
       </div>
