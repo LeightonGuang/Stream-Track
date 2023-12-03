@@ -1,0 +1,41 @@
+@use "../../sass/variables.scss" as *;
+.header {
+  &__container {
+    // display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__title {
+    margin: 0.5rem;
+  }
+
+  &__nav {
+  }
+
+  &__list {
+    display: flex;
+    list-style: none;
+    justify-content: space-between;
+  }
+
+  &__link {
+    text-decoration: none;
+    color: black;
+    width: 33.333%;
+    text-align: center;
+    padding: 0.5rem;
+
+    &--all {
+    }
+
+    &--twitch {
+      background-color: $twitch-purple;
+      color: white;
+    }
+    &--youtube {
+      background-color: $youtube-red;
+      color: white;
+    }
+  }
+}
