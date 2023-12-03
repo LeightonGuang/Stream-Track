@@ -1,0 +1,9 @@
+{
+  "manifest_version": 3,
+  "name": "Stream Track",
+  "version": "1.0",
+  "description": "Track twitch and youtube streamer live activity",
+  "action": {
+    "default_popup": "index.html"
+  }
+}
