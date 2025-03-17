@@ -8,6 +8,7 @@ module.exports = {
       colors: {
         twitch: "#9146FF",
         youtube: "#FF0000",
+        background: "#1a141c",
       },
     },
   },
