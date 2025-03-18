@@ -1,12 +1,12 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { Popup } from "./chrome-extension/popup/index";
+import Options from "./chrome-extension/options/index";
 import "./chrome-extension/global.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <div className="bg-white w-[600px] h-[500px]">
-      <Popup />
+    <div className="bg-white w-full h-[1000px]">
+      <Options />
     </div>
   </StrictMode>
 );
