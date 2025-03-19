@@ -6,7 +6,7 @@ export default {
       colors: {
         twitch: "#9146FF",
         youtube: "#FF0000",
-        background: "#1a141c",
+        background: "#0e0e10",
       },
     },
   },
