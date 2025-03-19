@@ -1,6 +1,5 @@
 import axios from "axios";
 import { TwitchIcon, YouTubeIcon } from "../../public/icons";
-import FollowedChannelsType from "../../../types/FollowedChannelsType";
 
 interface ManifestType {
   oauth2?: {
@@ -8,6 +7,11 @@ interface ManifestType {
     scopes: string[];
     redirect_uri: string;
   };
+}
+
+interface FollowedChannelsType {
+  broadcaster_id: string;
+  broadcaster_name: string;
 }
 
 const generateRandomState = () => {
