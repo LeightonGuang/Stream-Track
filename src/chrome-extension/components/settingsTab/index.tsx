@@ -1,5 +1,6 @@
 import axios from "axios";
 import { TwitchIcon, YouTubeIcon } from "../../public/icons";
+import FollowedChannelsType from "../../../types/FollowedChannelsType";
 
 interface ManifestType {
   oauth2?: {
@@ -75,7 +76,7 @@ const SettingsTab = () => {
       }
 
       try {
-        const followings = [];
+        const followings: FollowedChannelsType[] = [];
         let cursor = null;
 
         do {
@@ -95,7 +96,15 @@ const SettingsTab = () => {
           );
 
           cursor = response.data.pagination.cursor || null;
-          followings.push(...response.data.data);
+
+          followings.push(
+            ...response.data.data.map(
+              ({ broadcaster_id, broadcaster_name }) => ({
+                broadcaster_id,
+                broadcaster_name,
+              }),
+            ),
+          );
         } while (cursor);
 
         console.log(followings);
@@ -103,6 +112,56 @@ const SettingsTab = () => {
       } catch (error) {
         console.error("Error fetching followed channels:", error);
         return [];
+      }
+    };
+
+    const getStreamersProfilePics = async (
+      followedChannels: FollowedChannelsType[],
+      accessToken: string,
+    ) => {
+      try {
+        const followedChannelsIds = followedChannels
+          .slice(0, 100)
+          .map((channel) => channel.broadcaster_id);
+        console.log(followedChannelsIds);
+
+        const response: { data: { data: any[] } } = await axios.get(
+          "https://api.twitch.tv/helix/users",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Client-Id": clientId,
+            },
+            params: {
+              part: "snippet",
+              id: followedChannelsIds,
+            },
+            paramsSerializer: (params) =>
+              Object.entries(params)
+                .flatMap(([key, value]) =>
+                  Array.isArray(value)
+                    ? value.map((v) => `${key}=${encodeURIComponent(v)}`)
+                    : `${key}=${encodeURIComponent(value)}`,
+                )
+                .join("&"),
+          },
+        );
+
+        interface ChannelDataType {
+          id: string;
+          display_name: string;
+          profile_image_url: string;
+        }
+        const filteredDatas = response.data.data.map(
+          ({ id, display_name, profile_image_url }: ChannelDataType) => ({
+            id,
+            display_name,
+            profile_image_url,
+          }),
+        );
+        return filteredDatas;
+      } catch (error) {
+        console.error("Error fetching streamers profile pics:", error);
       }
     };
 
@@ -114,6 +173,7 @@ const SettingsTab = () => {
       }
 
       const userId = await getUserId(accessToken);
+      chrome.storage.local.set({ userId });
       if (!userId) {
         console.error("No user id");
         return;
@@ -121,7 +181,13 @@ const SettingsTab = () => {
 
       const followedChannels = await getFollowedChannels(userId, accessToken);
       console.log(followedChannels);
-      chrome.storage.local.set({ followedChannels });
+
+      const ChannelData = await getStreamersProfilePics(
+        followedChannels,
+        accessToken,
+      );
+      console.log(ChannelData);
+      chrome.storage.local.set({ followedChannels: ChannelData });
     } catch (error) {
       console.error("Error during login flow", error);
     }
