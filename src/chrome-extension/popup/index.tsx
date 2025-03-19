@@ -36,7 +36,7 @@ export const Popup = () => {
         </button>
       </div>
 
-      <div className="p-2">
+      <div className="flex w-full justify-center p-2">
         {selectedTab === "list" && <ListTab />}
         {selectedTab === "settings" && <SettingsTab />}
       </div>
