@@ -12,5 +12,10 @@
     "32": "public/32.png",
     "48": "public/48.png",
     "192": "public/192.png"
-  }
+  },
+  "oauth2": {
+    "client_id": "z5gia7a4ohqd22biljf6c6h0ukj2fk",
+    "scopes": ["user:read:follows"]
+  },
+  "permissions": ["identity", "storage"]
 }
