@@ -10,7 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/axios": "^0.9.36",
     "@types/node": "^22.5.5",
+    "axios": "^1.8.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "vite-plugin-static-copy": "^2.3.0"
