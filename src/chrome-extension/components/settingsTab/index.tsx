@@ -111,7 +111,6 @@ const SettingsTab = () => {
           );
         } while (cursor);
 
-        console.log(followings);
         return followings;
       } catch (error) {
         console.error("Error fetching followed channels:", error);
@@ -123,47 +122,56 @@ const SettingsTab = () => {
       followedChannels: FollowedChannelsType[],
       accessToken: string,
     ) => {
-      try {
-        const followedChannelsIds = followedChannels
-          .slice(0, 100)
-          .map((channel) => channel.broadcaster_id);
-        console.log(followedChannelsIds);
+      interface ChannelDataType {
+        id: string;
+        display_name: string;
+        profile_image_url: string;
+      }
 
-        const response: { data: { data: any[] } } = await axios.get(
-          "https://api.twitch.tv/helix/users",
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Client-Id": clientId,
-            },
-            params: {
-              part: "snippet",
-              id: followedChannelsIds,
-            },
-            paramsSerializer: (params) =>
-              Object.entries(params)
-                .flatMap(([key, value]) =>
-                  Array.isArray(value)
-                    ? value.map((v) => `${key}=${encodeURIComponent(v)}`)
-                    : `${key}=${encodeURIComponent(value)}`,
-                )
-                .join("&"),
-          },
+      try {
+        const chunkSize = 100;
+
+        const chunks = Array.from(
+          { length: Math.ceil(followedChannels.length / chunkSize) },
+          (_, i) =>
+            followedChannels
+              .slice(i * chunkSize, i * chunkSize + chunkSize)
+              .map((channel) => channel.broadcaster_id),
         );
 
-        interface ChannelDataType {
-          id: string;
-          display_name: string;
-          profile_image_url: string;
-        }
-        const filteredDatas = response.data.data.map(
-          ({ id, display_name, profile_image_url }: ChannelDataType) => ({
-            id,
-            display_name,
-            profile_image_url,
+        const responses = await Promise.all(
+          chunks.map(async (ids) => {
+            const response: { data: { data: any[] } } = await axios.get(
+              "https://api.twitch.tv/helix/users",
+              {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                  "Client-Id": clientId,
+                },
+                params: { id: ids },
+                paramsSerializer: (params) =>
+                  Object.entries(params)
+                    .flatMap(([key, value]) =>
+                      Array.isArray(value)
+                        ? value.map((v) => `${key}=${encodeURIComponent(v)}`)
+                        : `${key}=${encodeURIComponent(value)}`,
+                    )
+                    .join("&"),
+              },
+            );
+
+            return response.data.data.map(
+              ({ id, display_name, profile_image_url }: ChannelDataType) => ({
+                id,
+                display_name,
+                profile_image_url,
+              }),
+            );
           }),
         );
-        return filteredDatas;
+
+        const allProfiles = responses.flat();
+        return allProfiles;
       } catch (error) {
         console.error("Error fetching streamers profile pics:", error);
       }
@@ -183,15 +191,16 @@ const SettingsTab = () => {
         return;
       }
 
-      const followedChannels = await getFollowedChannels(userId, accessToken);
-      console.log(followedChannels);
-
-      const ChannelData = await getStreamersProfilePics(
-        followedChannels,
+      const allFollowedChannels = await getFollowedChannels(
+        userId,
         accessToken,
       );
-      console.log(ChannelData);
-      chrome.storage.local.set({ followedChannels: ChannelData });
+
+      const channelData = await getStreamersProfilePics(
+        allFollowedChannels,
+        accessToken,
+      );
+      chrome.storage.local.set({ followedChannels: channelData });
     } catch (error) {
       console.error("Error during login flow", error);
     }
