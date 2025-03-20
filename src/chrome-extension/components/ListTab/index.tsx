@@ -28,46 +28,55 @@ const ListTab = () => {
 
   const getLiveStreamers = async (accessToken: string) => {
     try {
-      // const { userId } = await chrome.storage.local.get("userId");
-
       console.log("followedChannels:", followedChannels);
 
-      const streamerIds = followedChannels
-        .slice(0, 100)
-        .map((streamer) => streamer.id);
-      console.log("streamerIds: ", streamerIds);
+      const chunkSize = 100;
+      const streamerIdChunks = Array.from(
+        { length: Math.ceil(followedChannels.length / chunkSize) },
+        (_, i) =>
+          followedChannels
+            .slice(i * chunkSize, i * chunkSize + chunkSize)
+            .map((streamer) => streamer.id),
+      );
 
       const manifest = chrome.runtime.getManifest() as ManifestType;
       const clientId = manifest.oauth2?.client_id;
 
-      const response: { data: { data: any[] } } = await axios.get(
-        "https://api.twitch.tv/helix/streams",
-        {
-          headers: {
-            "Client-Id": clientId,
-            Authorization: `Bearer ${accessToken}`,
+      const allRequests = streamerIdChunks.map(async (chunk) => {
+        const response: { data: { data: any[] } } = await axios.get(
+          "https://api.twitch.tv/helix/streams",
+          {
+            headers: {
+              "Client-Id": clientId,
+              Authorization: `Bearer ${accessToken}`,
+            },
+            params: {
+              user_id: chunk,
+            },
+            paramsSerializer: (params: { [key: string]: any }) =>
+              Object.keys(params)
+                .map((key) =>
+                  Array.isArray(params[key])
+                    ? params[key]
+                        .map((val) => `${key}=${encodeURIComponent(val)}`)
+                        .join("&")
+                    : `${key}=${encodeURIComponent(params[key])}`,
+                )
+                .join("&"),
           },
-          params: {
-            user_id: streamerIds,
-          },
-          paramsSerializer: (params: { [key: string]: any }) => {
-            return Object.keys(params)
-              .map((key) =>
-                Array.isArray(params[key])
-                  ? params[key]
-                      .map((val) => `${key}=${encodeURIComponent(val)}`)
-                      .join("&")
-                  : `${key}=${encodeURIComponent(params[key])}`,
-              )
-              .join("&");
-          },
-        },
-      );
+        );
 
-      // console.log(response.data);
-      return response.data.data;
+        return response.data.data;
+      });
+
+      // Flatten the results into a single array
+      const allResults = (await Promise.all(allRequests)).flat();
+
+      console.log("streamers live: ", allResults);
+      return allResults;
     } catch (error) {
       console.error("Error fetching streamers live status: ", error);
+      return [];
     }
   };
 
