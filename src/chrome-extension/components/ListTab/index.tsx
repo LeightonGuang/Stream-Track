@@ -108,57 +108,53 @@ const ListTab = () => {
   }, [followedChannels]);
 
   return (
-    <div>
-      <h2 className="text-base font-bold">Streamers currently live</h2>
+    <div className="flex h-[calc(2.65rem*10)] w-dvw flex-col items-center overflow-y-auto">
+      {!isLoading
+        ? liveChannels.map((liveChannelData) => {
+            const channelData = followedChannels.find(
+              (channel) =>
+                String(channel.id).trim() ===
+                String(liveChannelData.user_id).trim(),
+            );
 
-      <div className="mt-2">
-        {!isLoading
-          ? liveChannels.map((liveChannelData) => {
-              const channelData = followedChannels.find(
-                (channel) =>
-                  String(channel.id).trim() ===
-                  String(liveChannelData.user_id).trim(),
-              );
+            return (
+              <a
+                key={liveChannelData.user_id}
+                className="flex w-[13.75rem] max-w-[13.75rem] items-center bg-[#1f1e22] px-[0.625rem] py-[0.3125rem] hover:bg-[#27262c]"
+                href={`https://www.twitch.tv/${channelData.display_name}`}
+                target="_blank"
+              >
+                <img
+                  alt={channelData.display_name}
+                  className="h-[1.875rem] w-[1.875rem] rounded-full"
+                  src={channelData.profile_image_url}
+                />
 
-              return (
-                <a
-                  key={liveChannelData.user_id}
-                  className="flex w-[13.75rem] max-w-[13.75rem] items-center bg-[#1f1e22] px-[0.625rem] py-[0.3125rem] hover:bg-[#27262c]"
-                  href={`https://www.twitch.tv/${channelData.display_name}`}
-                  target="_blank"
-                >
-                  <img
-                    alt={channelData.display_name}
-                    className="h-[1.875rem] w-[1.875rem] rounded-full"
-                    src={channelData.profile_image_url}
-                  />
+                <div className="ml-[0.625rem] flex w-[11.25rem] max-w-[11.25rem]">
+                  <div className="flex flex-grow flex-col">
+                    <p className="overflow-hidden text-ellipsis whitespace-nowrap text-sm font-semibold leading-[1.05rem] text-[#dedee3]">
+                      {channelData.display_name}
+                    </p>
 
-                  <div className="ml-[0.625rem] flex w-[11.25rem] max-w-[11.25rem]">
-                    <div className="flex flex-grow flex-col">
-                      <p className="overflow-hidden text-ellipsis whitespace-nowrap text-sm font-semibold leading-[1.05rem] text-[#dedee3]">
-                        {channelData.display_name}
-                      </p>
+                    <p className="max-w-[7rem] overflow-hidden text-ellipsis whitespace-nowrap text-[0.8125rem] font-normal leading-[0.975rem] text-[#adadb8]">
+                      {liveChannelData.game_name}
+                    </p>
+                  </div>
 
-                      <p className="max-w-[7rem] overflow-hidden text-ellipsis whitespace-nowrap text-[0.8125rem] font-normal leading-[0.975rem] text-[#adadb8]">
-                        {liveChannelData.game_name}
-                      </p>
-                    </div>
+                  <div className="ml-[0.3125rem] h-[2.025rem] flex-shrink-0">
+                    <div className="flex h-[1.2188rem] min-w-[2.5rem] items-center gap-[0.3125rem]">
+                      <div className="flex h-2 w-2 items-center justify-center rounded-full bg-[#ec0400]" />
 
-                    <div className="ml-[0.3125rem] h-[2.025rem] flex-shrink-0">
-                      <div className="flex h-[1.2188rem] min-w-[2.5rem] items-center gap-[0.3125rem]">
-                        <div className="flex h-2 w-2 items-center justify-center rounded-full bg-[#ec0400]" />
-
-                        <span className="flex h-auto items-center text-[0.8125rem] font-normal leading-[1.2188rem] text-[#dedee3]">
-                          {formatViewCount(liveChannelData.viewer_count)}
-                        </span>
-                      </div>
+                      <span className="flex h-auto items-center text-[0.8125rem] font-normal leading-[1.2188rem] text-[#dedee3]">
+                        {formatViewCount(liveChannelData.viewer_count)}
+                      </span>
                     </div>
                   </div>
-                </a>
-              );
-            })
-          : "Loading..."}
-      </div>
+                </div>
+              </a>
+            );
+          })
+        : "Loading..."}
     </div>
   );
 };
