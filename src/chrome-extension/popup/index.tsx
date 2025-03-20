@@ -9,14 +9,14 @@ export const Popup = () => {
   const [selectedTab, setSelectedTab] = useState<string>("list");
 
   return (
-    <div className="bg-background text-white">
+    <div className="max-w-[13.75rem] bg-background text-white">
       <div className="bg-twitch py-2 text-center text-xl font-bold text-white">
         <h1>Stream Track</h1>
       </div>
 
-      <div className="flex w-full gap-2 p-2">
+      <div className="flex h-[3.125rem] w-full bg-[#18181a]">
         <button
-          className={`flex w-full items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-semibold hover:bg-[#231628] hover:text-[#d0c8d4] ${selectedTab === "list" ? "bg-[#391e47]" : "bg-[#1e1623] text-[#847e88]"}`}
+          className={`flex w-full items-center justify-center gap-2 border-b-[0.125rem] border-[#18181a] px-[0.625rem] py-2 text-sm font-semibold hover:text-[#bc98f1] ${selectedTab === "list" ? "border-[#bc98f1] text-[#bc98f1]" : "text-[##ececec]"}`}
           onClick={() => {
             setSelectedTab("list");
           }}
@@ -26,7 +26,7 @@ export const Popup = () => {
         </button>
 
         <button
-          className={`flex w-full items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-semibold hover:bg-[#231628] hover:text-[#d0c8d4] ${selectedTab === "settings" ? "bg-[#391e47]" : "bg-[#1e1623] text-[#847e88]"}`}
+          className={`flex w-full items-center justify-center gap-2 border-b-[0.125rem] border-[#18181a] px-[0.625rem] py-2 text-sm font-semibold hover:text-[#bc98f1] ${selectedTab === "settings" ? "border-[#bc98f1] text-[#bc98f1]" : "text-[##ececec]"}`}
           onClick={() => {
             setSelectedTab("settings");
           }}
@@ -36,7 +36,7 @@ export const Popup = () => {
         </button>
       </div>
 
-      <div className="flex w-full justify-center p-2">
+      <div className="flex w-full justify-center">
         {selectedTab === "list" && <ListTab />}
         {selectedTab === "settings" && <SettingsTab />}
       </div>
