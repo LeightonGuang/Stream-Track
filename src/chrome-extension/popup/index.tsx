@@ -9,8 +9,8 @@ export const Popup = () => {
   const [selectedTab, setSelectedTab] = useState<string>("list");
 
   return (
-    <div className="max-w-[13.75rem] bg-background text-white">
-      <div className="bg-twitch py-2 text-center text-xl font-bold text-white">
+    <div className="flex flex-col items-center whitespace-nowrap bg-background text-white">
+      <div className="w-full bg-twitch py-2 text-center text-xl font-bold text-white">
         <h1>Stream Track</h1>
       </div>
 
@@ -36,7 +36,7 @@ export const Popup = () => {
         </button>
       </div>
 
-      <div className="flex w-full justify-center">
+      <div className="flex h-max w-max justify-center">
         {selectedTab === "list" && <ListTab />}
         {selectedTab === "settings" && <SettingsTab />}
       </div>
