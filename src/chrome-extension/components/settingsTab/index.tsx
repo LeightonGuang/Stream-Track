@@ -1,5 +1,6 @@
 import axios from "axios";
 import { TwitchIcon, YouTubeIcon } from "../../public/icons";
+import generateRandomState from "../../utils/generateRandomState";
 
 interface ManifestType {
   oauth2?: {
@@ -13,10 +14,6 @@ interface FollowedChannelsType {
   broadcaster_id: string;
   broadcaster_name: string;
 }
-
-const generateRandomState = () => {
-  return Math.random().toString(36).substring(2, 15);
-};
 
 const SettingsTab = () => {
   const manifest = chrome.runtime.getManifest() as ManifestType;
