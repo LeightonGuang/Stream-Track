@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import formatViewCount from "../../utils/formatViewCount";
+import generateRandomState from "../../utils/generateRandomState";
+import validateTwitchToken from "../../utils/twitchValidateToken";
 
 interface ManifestType {
   oauth2?: {
@@ -14,18 +16,39 @@ const ListTab = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [followedChannels, setFollowedChannels] = useState<any[]>([]);
   const [liveChannels, setLiveChannels] = useState<any[]>([]);
-  console.log(liveChannels);
 
-  // const getAppAccessToken = async () => {
-  //   try {
-  //     const response = await axios.get("https://id.twitch.tv/oauth2/token");
-  //     return "some access token";
-  //   } catch (error) {
-  //     console.error("Error getting app access token: ", error);
-  //     return "error";
-  //   }
-  // };
+  const manifest = chrome.runtime.getManifest() as ManifestType;
+  const clientId = manifest.oauth2?.client_id;
 
+  const getAppAccessToken = async (): Promise<string | null> => {
+    return new Promise((resolve, reject) => {
+      const redirectUri = chrome.identity.getRedirectURL();
+      const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=user:read:follows&state=${generateRandomState()}`;
+
+      chrome.identity.launchWebAuthFlow(
+        { url: authUrl, interactive: true },
+        (redirectUrl) => {
+          if (chrome.runtime.lastError) {
+            console.error(chrome.runtime.lastError.message);
+            reject(chrome.runtime.lastError.message);
+            return;
+          }
+
+          if (redirectUrl) {
+            const params = new URLSearchParams(
+              new URL(redirectUrl).hash.substring(1),
+            );
+            const accessToken = params.get("access_token");
+            resolve(accessToken || null);
+          } else {
+            reject("No redirect URL found");
+          }
+        },
+      );
+    });
+  };
+
+  // get streamers that are live
   const getLiveStreamers = async (accessToken: string) => {
     try {
       console.log("followedChannels:", followedChannels);
@@ -38,9 +61,6 @@ const ListTab = () => {
             .slice(i * chunkSize, i * chunkSize + chunkSize)
             .map((streamer) => streamer.id),
       );
-
-      const manifest = chrome.runtime.getManifest() as ManifestType;
-      const clientId = manifest.oauth2?.client_id;
 
       const allRequests = streamerIdChunks.map(async (chunk) => {
         const response: { data: { data: any[] } } = await axios.get(
@@ -81,11 +101,25 @@ const ListTab = () => {
   };
 
   const getLiveFlow = async () => {
-    // const accessToken = await getAppAccessToken();
-    if (followedChannels.length === 0) return;
+    let { accessToken } = await chrome.storage.local.get("accessToken");
+    console.log("accessToken: ", accessToken);
 
-    const accessToken = "kphaq7v53lvca94svafcbbb1l2it6t";
+    if (accessToken) {
+      const tokenIsValid = await validateTwitchToken(accessToken);
+
+      if (!tokenIsValid) {
+        console.log("Token is invalid");
+        accessToken = await getAppAccessToken();
+        chrome.storage.local.set({ accessToken });
+      }
+    } else if (!accessToken) {
+      console.log("Access token is null");
+      accessToken = await getAppAccessToken();
+      chrome.storage.local.set({ accessToken });
+    }
+    if (followedChannels.length === 0) return;
     const live = await getLiveStreamers(accessToken);
+    chrome.storage.local.set({ liveChannels: live });
     chrome.action.setBadgeBackgroundColor({ color: "#9146FF" });
     chrome.action.setBadgeText({ text: live ? live.length.toString() : "0" });
     console.log("streamers live: ", live);
@@ -98,6 +132,8 @@ const ListTab = () => {
       if (followedChannels) {
         console.log(followedChannels);
         setFollowedChannels(followedChannels);
+      } else {
+        setFollowedChannels([]);
       }
     });
   }, []);
