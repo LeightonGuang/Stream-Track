@@ -211,25 +211,27 @@ const SettingsTab = () => {
   };
 
   return (
-    <div>
-      <h2 className="text-base font-bold">Settings</h2>
+    <div className="flex h-full w-dvw">
+      <div className="p-2">
+        <h2 className="text-base font-bold">Settings</h2>
 
-      <div className="mt-2 flex flex-col gap-1">
-        <button
-          className="flex w-max gap-1 rounded-md bg-twitch px-2 py-1"
-          onClick={handleTwitchLoginButton}
-        >
-          <TwitchIcon className="w-4" />
-          <span className="font-medium">Login with Twitch</span>
-        </button>
+        <div className="mt-2 flex flex-col gap-2">
+          <button
+            className="flex w-max gap-1 rounded-md bg-twitch px-2 py-1"
+            onClick={handleTwitchLoginButton}
+          >
+            <TwitchIcon className="w-4" />
+            <span className="font-medium">Login with Twitch</span>
+          </button>
 
-        <button
-          className="flex w-max gap-1 rounded-md bg-youtube px-2 py-1"
-          onClick={handleYoutubeLoginButton}
-        >
-          <YouTubeIcon className="w-4" />
-          <span className="font-medium">Login with Youtube</span>
-        </button>
+          <button
+            className="flex w-max gap-1 rounded-md bg-youtube px-2 py-1"
+            onClick={handleYoutubeLoginButton}
+          >
+            <YouTubeIcon className="w-4" />
+            <span className="font-medium">Login with Youtube</span>
+          </button>
+        </div>
       </div>
     </div>
   );
