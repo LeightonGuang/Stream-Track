@@ -14,6 +14,7 @@ interface ManifestType {
 
 const ListTab = () => {
   const [isLoading, setIsLoading] = useState(true);
+  // followedChannels is for streamers profile pictures
   const [followedChannels, setFollowedChannels] = useState<any[]>([]);
   const [liveChannels, setLiveChannels] = useState<any[]>([]);
 
@@ -47,9 +48,8 @@ const ListTab = () => {
       );
     });
   };
-
   // get streamers that are live
-  const getLiveStreamers = async (accessToken: string) => {
+  const getLiveStreamers = async (accessToken: string): Promise<any[]> => {
     try {
       console.log("followedChannels:", followedChannels);
 
@@ -100,46 +100,52 @@ const ListTab = () => {
     }
   };
 
-  const getLiveFlow = async () => {
-    let { accessToken } = await chrome.storage.local.get("accessToken");
-    console.log("accessToken: ", accessToken);
+  const processTasks = async () => {
+    try {
+      let { accessToken } = await chrome.storage.local.get("accessToken");
 
-    if (accessToken) {
-      const tokenIsValid = await validateTwitchToken(accessToken);
+      if (accessToken) {
+        const tokenIsValid = await validateTwitchToken(accessToken);
 
-      if (!tokenIsValid) {
-        console.log("Token is invalid");
+        if (!tokenIsValid) {
+          console.log("Token is invalid");
+          accessToken = await getAppAccessToken();
+          chrome.storage.local.set({ accessToken });
+        }
+      } else if (!accessToken) {
+        console.log("Access token is null");
         accessToken = await getAppAccessToken();
         chrome.storage.local.set({ accessToken });
       }
-    } else if (!accessToken) {
-      console.log("Access token is null");
-      accessToken = await getAppAccessToken();
-      chrome.storage.local.set({ accessToken });
+      if (followedChannels.length === 0) return;
+      const live = await getLiveStreamers(accessToken);
+      chrome.storage.local.set({ liveChannels: live });
+      chrome.action.setBadgeBackgroundColor({ color: "#9146FF" });
+      chrome.action.setBadgeText({ text: live ? live.length.toString() : "0" });
+      console.log("streamers live: ", live);
+      setLiveChannels(live ?? []);
+    } catch (error) {
+      console.error("Error running processTasks: ", error);
     }
-    if (followedChannels.length === 0) return;
-    const live = await getLiveStreamers(accessToken);
-    chrome.storage.local.set({ liveChannels: live });
-    chrome.action.setBadgeBackgroundColor({ color: "#9146FF" });
-    chrome.action.setBadgeText({ text: live ? live.length.toString() : "0" });
-    console.log("streamers live: ", live);
-    setLiveChannels(live ?? []);
   };
 
   useEffect(() => {
-    chrome.storage.local.get("followedChannels", (result) => {
-      const followedChannels = result.followedChannels;
+    const getFollowedChannels = async () => {
+      const { followedChannels } =
+        await chrome.storage.local.get("followedChannels");
       if (followedChannels) {
         console.log(followedChannels);
         setFollowedChannels(followedChannels);
       } else {
         setFollowedChannels([]);
       }
-    });
+    };
+
+    getFollowedChannels();
   }, []);
 
   useEffect(() => {
-    getLiveFlow();
+    processTasks();
     setIsLoading(false);
   }, [followedChannels]);
 
@@ -168,11 +174,11 @@ const ListTab = () => {
 
                 <div className="ml-[0.625rem] flex w-[11.25rem] max-w-[11.25rem]">
                   <div className="flex flex-grow flex-col">
-                    <p className="overflow-hidden text-ellipsis whitespace-nowrap text-sm font-semibold leading-[1.05rem] text-[#dedee3]">
+                    <p className="max-w-[7rem] overflow-x-clip overflow-y-visible text-ellipsis whitespace-nowrap text-sm font-semibold leading-[1.05rem] text-[#dedee3]">
                       {channelData.display_name}
                     </p>
 
-                    <p className="max-w-[7rem] overflow-hidden text-ellipsis whitespace-nowrap text-[0.8125rem] font-normal leading-[0.975rem] text-[#adadb8]">
+                    <p className="max-w-[7rem] overflow-x-clip overflow-y-visible text-ellipsis whitespace-nowrap text-[0.8125rem] font-normal leading-[0.975rem] text-[#adadb8]">
                       {liveChannelData.game_name}
                     </p>
                   </div>
