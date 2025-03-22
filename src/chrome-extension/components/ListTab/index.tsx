@@ -130,6 +130,20 @@ const ListTab = () => {
   };
 
   useEffect(() => {
+    const getLocalLiveChannels = async () => {
+      const { liveChannels } = await chrome.storage.local.get("liveChannels");
+      if (liveChannels) {
+        console.log(liveChannels);
+        setLiveChannels(liveChannels);
+      } else {
+        setLiveChannels([]);
+      }
+    };
+
+    getLocalLiveChannels();
+  }, []);
+
+  useEffect(() => {
     const getFollowedChannels = async () => {
       const { followedChannels } =
         await chrome.storage.local.get("followedChannels");
