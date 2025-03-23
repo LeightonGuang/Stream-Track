@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { TwitchViewerIcon } from "../../public/icons";
 import formatViewCount from "../../utils/formatViewCount";
-import validateTwitchToken from "../../utils/twitchValidateToken";
+import validateTwitchToken from "../../utils/twitchApi/validateTwitchToken";
 
 import { LiveChannelType } from "../../../types/liveChannelType";
 import { FollowedChannelsType } from "../../../types/FollowedChannelsType";
