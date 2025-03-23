@@ -5,6 +5,7 @@
   "action": {
     "default_popup": "popup.html"
   },
+  "background": { "service_worker": "background.js", "type": "module" },
   "options_page": "options.html",
   "description": "This is the description of your extension",
   "icons": {
@@ -17,5 +18,5 @@
     "client_id": "z5gia7a4ohqd22biljf6c6h0ukj2fk",
     "scopes": ["user:read:follows"]
   },
-  "permissions": ["identity", "storage"]
+  "permissions": ["identity", "storage", "alarms"]
 }
