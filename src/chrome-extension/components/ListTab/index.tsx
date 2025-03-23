@@ -1,107 +1,20 @@
-import axios from "axios";
 import { useState, useEffect } from "react";
+import { TwitchViewerIcon } from "../../public/icons";
 import formatViewCount from "../../utils/formatViewCount";
-import generateRandomState from "../../utils/generateRandomState";
 import validateTwitchToken from "../../utils/twitchValidateToken";
 
-import { TwitchViewerIcon } from "../../public/icons";
 import { LiveChannelType } from "../../../types/liveChannelType";
-
-interface ManifestType {
-  oauth2?: {
-    client_id: string;
-    scopes: string[];
-    redirect_uri: string;
-  };
-}
+import { FollowedChannelsType } from "../../../types/FollowedChannelsType";
+import getLiveStreamers from "../../utils/twitchApi/getLiveStreamers";
+import getAppAccessToken from "../../utils/twitchApi/getAppAccessToken";
 
 const ListTab = () => {
   const [isLoading, setIsLoading] = useState(true);
   // followedChannels is for streamers profile pictures
-  const [followedChannels, setFollowedChannels] = useState<any[]>([]);
+  const [followedChannels, setFollowedChannels] = useState<
+    FollowedChannelsType[]
+  >([]);
   const [liveChannels, setLiveChannels] = useState<any[]>([]);
-
-  const manifest = chrome.runtime.getManifest() as ManifestType;
-  const clientId = manifest.oauth2?.client_id;
-
-  const getAppAccessToken = async (): Promise<string | null> => {
-    return new Promise((resolve, reject) => {
-      const redirectUri = chrome.identity.getRedirectURL();
-      const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=user:read:follows&state=${generateRandomState()}`;
-
-      chrome.identity.launchWebAuthFlow(
-        { url: authUrl, interactive: true },
-        (redirectUrl) => {
-          if (chrome.runtime.lastError) {
-            console.error(chrome.runtime.lastError.message);
-            reject(chrome.runtime.lastError.message);
-            return;
-          }
-
-          if (redirectUrl) {
-            const params = new URLSearchParams(
-              new URL(redirectUrl).hash.substring(1),
-            );
-            const accessToken = params.get("access_token");
-            resolve(accessToken || null);
-          } else {
-            reject("No redirect URL found");
-          }
-        },
-      );
-    });
-  };
-  // get streamers that are live
-  const getLiveStreamers = async (accessToken: string): Promise<any[]> => {
-    try {
-      console.log("followedChannels:", followedChannels);
-
-      const chunkSize = 100;
-      const streamerIdChunks = Array.from(
-        { length: Math.ceil(followedChannels.length / chunkSize) },
-        (_, i) =>
-          followedChannels
-            .slice(i * chunkSize, i * chunkSize + chunkSize)
-            .map((streamer) => streamer.id),
-      );
-
-      const allRequests = streamerIdChunks.map(async (chunk) => {
-        const response: { data: { data: any[] } } = await axios.get(
-          "https://api.twitch.tv/helix/streams",
-          {
-            headers: {
-              "Client-Id": clientId,
-              Authorization: `Bearer ${accessToken}`,
-            },
-            params: {
-              user_id: chunk,
-            },
-            paramsSerializer: (params: { [key: string]: any }) =>
-              Object.keys(params)
-                .map((key) =>
-                  Array.isArray(params[key])
-                    ? params[key]
-                        .map((val) => `${key}=${encodeURIComponent(val)}`)
-                        .join("&")
-                    : `${key}=${encodeURIComponent(params[key])}`,
-                )
-                .join("&"),
-          },
-        );
-
-        return response.data.data;
-      });
-
-      // Flatten the results into a single array
-      const allResults = (await Promise.all(allRequests)).flat();
-
-      console.log("streamers live: ", allResults);
-      return allResults;
-    } catch (error) {
-      console.error("Error fetching streamers live status: ", error);
-      return [];
-    }
-  };
 
   const processTasks = async () => {
     try {
@@ -120,8 +33,9 @@ const ListTab = () => {
         accessToken = await getAppAccessToken();
         chrome.storage.local.set({ accessToken });
       }
+
       if (followedChannels.length === 0) return;
-      const live = await getLiveStreamers(accessToken);
+      const live = await getLiveStreamers(followedChannels, accessToken);
       chrome.storage.local.set({ liveChannels: live });
       chrome.action.setBadgeBackgroundColor({ color: "#9146FF" });
       chrome.action.setBadgeText({ text: live ? live.length.toString() : "0" });
