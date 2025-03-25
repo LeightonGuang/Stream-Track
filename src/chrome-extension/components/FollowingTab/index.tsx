@@ -46,32 +46,14 @@ const FollowingTab = () => {
   };
 
   useEffect(() => {
-    const getLocalLiveChannels = async () => {
-      const { liveChannels } = await chrome.storage.local.get("liveChannels");
-      if (liveChannels) {
-        console.log(liveChannels);
-        setLiveChannels(liveChannels);
-      } else {
-        setLiveChannels([]);
-      }
+    const fetchLocalData = async () => {
+      const { liveChannels, followedChannels } = await chrome.storage.local.get(
+        ["liveChannels", "followedChannels"],
+      );
+      setLiveChannels(liveChannels ?? []);
+      setFollowedChannels(followedChannels ?? []);
     };
-
-    getLocalLiveChannels();
-  }, []);
-
-  useEffect(() => {
-    const getFollowedChannels = async () => {
-      const { followedChannels } =
-        await chrome.storage.local.get("followedChannels");
-      if (followedChannels) {
-        console.log(followedChannels);
-        setFollowedChannels(followedChannels);
-      } else {
-        setFollowedChannels([]);
-      }
-    };
-
-    getFollowedChannels();
+    fetchLocalData();
   }, []);
 
   useEffect(() => {
