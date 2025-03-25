@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import getUserId from "../../utils/twitchApi/getUserId";
 import { TwitchIcon, YouTubeIcon } from "../../public/icons";
 import getAppAccessToken from "../../utils/twitchApi/getAppAccessToken";
@@ -5,14 +6,17 @@ import getFollowedChannels from "../../utils/twitchApi/getFollowedChannels";
 import getStreamersProfilePics from "../../utils/twitchApi/getStreamersProfilePics";
 
 import { ManifestType } from "../../../types/manifestType";
+import { LocalSettingsType } from "../../../types/LocalSettingsType";
 
 // TODO : Options to turn off stream preview
 
 const SettingsTab = () => {
   const manifest = chrome.runtime.getManifest() as ManifestType;
   const version = manifest.version;
-  console.log(version);
   const clientId = manifest.oauth2?.client_id;
+
+  const [localSettingsState, setLocalSettingsState] =
+    useState<LocalSettingsType>({} as LocalSettingsType);
 
   const handleTwitchLoginButton = async () => {
     // get list of user's followed channels and store in chrome storage
@@ -52,10 +56,56 @@ const SettingsTab = () => {
     console.log("Youtube button clicked");
   };
 
+  const handleStreamPreviewToggle = async () => {
+    setLocalSettingsState({
+      ...localSettingsState,
+      streamPreview: !localSettingsState.streamPreview,
+    });
+
+    await chrome.storage.local.set({
+      localSettings: {
+        ...localSettingsState,
+        streamPreview: !localSettingsState.streamPreview,
+      },
+    });
+  };
+
+  useEffect(() => {
+    const fetchAndSetLocalSettings = async () => {
+      try {
+        const { localSettings } =
+          await chrome.storage.local.get("localSettings");
+        console.log("localSettings: ", localSettings);
+
+        if (!localSettings || Object.keys(localSettings).length === 0) {
+          // set local settings to default values
+          setLocalSettingsState({ streamPreview: false });
+          await chrome.storage.local.set({
+            localSettings: { streamPreview: false },
+          });
+        } else if (localSettings) {
+          setLocalSettingsState(localSettings);
+        }
+      } catch (error) {
+        console.error("Error fetching and setting local settings", error);
+      }
+    };
+
+    fetchAndSetLocalSettings();
+  }, []);
+
+  useEffect(() => {
+    console.log(localSettingsState);
+  }, [localSettingsState]);
+
   return (
-    <div className="flex h-full w-dvw">
-      <div className="p-2">
-        <h2 className="text-base font-bold">Settings</h2>
+    <div className="flex h-min max-h-[calc(2.65rem*10)] w-dvw">
+      <div className="w-full p-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-bold">Settings</h2>
+
+          <span className="text-xs text-gray-500">v{version}</span>
+        </div>
 
         <div className="mt-2 flex flex-col gap-2">
           <button
@@ -73,6 +123,21 @@ const SettingsTab = () => {
             <YouTubeIcon className="w-4" />
             <span className="font-medium">Login with Youtube</span>
           </button>
+        </div>
+
+        <div className="mt-2 flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="streamPreview"
+              name="streamPreview"
+              checked={localSettingsState.streamPreview}
+              onChange={handleStreamPreviewToggle}
+            />
+            <label className="text-sm" htmlFor="streamPreview">
+              Stream Preview
+            </label>
+          </div>
         </div>
       </div>
     </div>
