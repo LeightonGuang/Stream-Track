@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 import { TwitchViewerIcon } from "../../public/icons";
 import formatViewCount from "../../utils/formatViewCount";
+import getStreamersLive from "../../utils/twitchApi/getStreamersLive";
+import getAppAccessToken from "../../utils/twitchApi/getAppAccessToken";
 import validateTwitchToken from "../../utils/twitchApi/validateTwitchToken";
 
 import { LiveChannelType } from "../../../types/liveChannelType";
-import { FollowedChannelsType } from "../../../types/FollowedChannelsType";
-import getLiveStreamers from "../../utils/twitchApi/getLiveStreamers";
-import getAppAccessToken from "../../utils/twitchApi/getAppAccessToken";
+import { ChromeStorageFollowedChannelsType } from "../../../types/ChromeStorageFollowedChannelsType";
 
 const ListTab = () => {
   const [isLoading, setIsLoading] = useState(true);
   // followedChannels is for streamers profile pictures
   const [followedChannels, setFollowedChannels] = useState<
-    FollowedChannelsType[]
+    ChromeStorageFollowedChannelsType[]
   >([]);
   const [liveChannels, setLiveChannels] = useState<any[]>([]);
 
@@ -24,7 +24,7 @@ const ListTab = () => {
         const tokenIsValid = await validateTwitchToken(accessToken);
 
         if (!tokenIsValid) {
-          console.log("Token is invalid");
+          console.error("Token is invalid");
           accessToken = await getAppAccessToken();
           chrome.storage.local.set({ accessToken });
         }
@@ -35,7 +35,7 @@ const ListTab = () => {
       }
 
       if (followedChannels.length === 0) return;
-      const live = await getLiveStreamers(followedChannels, accessToken);
+      const live = await getStreamersLive(followedChannels, accessToken);
       chrome.storage.local.set({ liveChannels: live });
       chrome.action.setBadgeBackgroundColor({ color: "#9146FF" });
       chrome.action.setBadgeText({ text: live ? live.length.toString() : "0" });
