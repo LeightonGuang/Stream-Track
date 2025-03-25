@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { TwitchUserType } from "../../../types/twitchUserType";
 
 const getUserId = async (
