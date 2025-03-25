@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { FollowedChannelsType } from "../../../types/FollowedChannelsType";
 import { FollowedChannelsNameIdType } from "../../../types/FollowedChannelsNameIdType";
 

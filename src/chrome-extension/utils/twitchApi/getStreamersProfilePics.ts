@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { FollowedChannelsNameIdType } from "../../../types/FollowedChannelsNameIdType";
 
 const getStreamersProfilePics = async (
