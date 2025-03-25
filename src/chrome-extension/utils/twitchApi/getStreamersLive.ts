@@ -1,12 +1,14 @@
 import axios from "axios";
+
 import { ManifestType } from "../../../types/manifestType";
-import { FollowedChannelsType } from "../../../types/FollowedChannelsType";
+import { LiveChannelType } from "../../../types/liveChannelType";
+import { ChromeStorageFollowedChannelsType } from "../../../types/ChromeStorageFollowedChannelsType";
 
 // get streamers that are live
-const getLiveStreamers = async (
-  followedChannels: FollowedChannelsType[],
+const getStreamersLive = async (
+  followedChannels: ChromeStorageFollowedChannelsType[],
   accessToken: string,
-): Promise<any[]> => {
+): Promise<LiveChannelType[]> => {
   try {
     const manifest = chrome.runtime.getManifest() as ManifestType;
     const clientId = manifest.oauth2?.client_id;
@@ -48,7 +50,9 @@ const getLiveStreamers = async (
     });
 
     // Flatten the results into a single array
-    const allResults = (await Promise.all(allRequests)).flat();
+    const allResults: LiveChannelType[] = (
+      await Promise.all(allRequests)
+    ).flat();
 
     console.log("streamers live: ", allResults);
     return allResults;
@@ -58,4 +62,4 @@ const getLiveStreamers = async (
   }
 };
 
-export default getLiveStreamers;
+export default getStreamersLive;
