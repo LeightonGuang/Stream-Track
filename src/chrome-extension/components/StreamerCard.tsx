@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TwitchViewerIcon } from "../public/icons";
 import formatViewCount from "../utils/formatViewCount";
 
 import { LiveChannelType } from "../../types/liveChannelType";
+import { LocalSettingsType } from "../../types/LocalSettingsType";
 
 const StreamerCard = ({
   liveChannelData,
@@ -12,6 +13,9 @@ const StreamerCard = ({
   channelData: any;
 }) => {
   const [isHover, setIsHover] = useState(false);
+  const [localSettings, setLocalSettings] = useState<LocalSettingsType>(
+    {} as LocalSettingsType,
+  );
 
   const formattedStreamCategory = (category: string) =>
     category.replace(/\s/g, "-").toLowerCase();
@@ -22,7 +26,16 @@ const StreamerCard = ({
     return formattedUrl;
   };
 
-  console.log(formattedThumbnailUrl(liveChannelData.thumbnail_url));
+  useEffect(() => {
+    const fetchLocalData = async () => {
+      const { localSettings } = await chrome.storage.local.get([
+        "localSettings",
+      ]);
+
+      setLocalSettings(localSettings);
+    };
+    fetchLocalData();
+  }, []);
 
   return (
     liveChannelData &&
@@ -34,8 +47,8 @@ const StreamerCard = ({
         onMouseEnter={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
       >
-        {isHover ? (
-          <div className="flex w-[13.75rem] flex-col overflow-x-clip bg-[#0e0e10] px-[0.625rem] py-[0.3125rem]">
+        {isHover && localSettings.streamPreview ? (
+          <div className="flex w-[13.75rem] flex-col overflow-x-clip bg-[#0e0e10] px-[0.625rem] py-[0.3125rem] hover:bg-[#27262c]">
             <img
               alt={liveChannelData.title}
               className="w-full object-cover"
@@ -51,7 +64,7 @@ const StreamerCard = ({
                 {liveChannelData.tags.map((tag: string) => (
                   <div
                     key={tag}
-                    className="flex items-center justify-center rounded-l-full rounded-r-full bg-[#2b292e] px-2 hover:bg-[#302f35]"
+                    className="flex items-center justify-center rounded-l-full rounded-r-full bg-[#2b292e] px-2"
                   >
                     <a
                       href={`https://www.twitch.tv/directory/all/tags/${tag}`}
@@ -84,7 +97,7 @@ const StreamerCard = ({
             </div>
           </div>
         ) : (
-          <div className="flex w-[15rem] max-w-[15rem] items-center bg-[#1f1e22] px-[0.625rem] py-[0.3125rem]">
+          <div className="flex w-[15rem] max-w-[15rem] items-center bg-[#1f1e22] px-[0.625rem] py-[0.3125rem] hover:bg-[#302f35]">
             <img
               alt={channelData.display_name}
               className="h-[1.875rem] w-[1.875rem] rounded-full"
