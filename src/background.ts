@@ -1,5 +1,5 @@
 import getAppAccessToken from "./chrome-extension/utils/twitchApi/getAppAccessToken";
-import getLiveStreamers from "./chrome-extension/utils/twitchApi/getLiveStreamers";
+import getStreamersLive from "./chrome-extension/utils/twitchApi/getStreamersLive";
 import validateTwitchToken from "./chrome-extension/utils/twitchApi/validateTwitchToken";
 
 const fetchLiveFlow = async () => {
@@ -16,16 +16,16 @@ const fetchLiveFlow = async () => {
       if (!tokenIsValid) {
         console.log("Token is invalid");
         accessToken = await getAppAccessToken();
-        chrome.storage.local.set({ accessToken });
+        await chrome.storage.local.set({ accessToken });
       }
     } else if (!accessToken) {
       console.log("Access token is null");
       accessToken = await getAppAccessToken();
-      chrome.storage.local.set({ accessToken });
+      await chrome.storage.local.set({ accessToken });
     }
 
-    const channelsLive = await getLiveStreamers(followedChannels, accessToken);
-    chrome.storage.local.set({ liveChannels: channelsLive });
+    const channelsLive = await getStreamersLive(followedChannels, accessToken);
+    await chrome.storage.local.set({ liveChannels: channelsLive });
     chrome.action.setBadgeBackgroundColor({ color: "#9146FF" });
     chrome.action.setBadgeText({ text: channelsLive.length.toString() });
   } catch (error) {

@@ -26,17 +26,17 @@ const ListTab = () => {
         if (!tokenIsValid) {
           console.error("Token is invalid");
           accessToken = await getAppAccessToken();
-          chrome.storage.local.set({ accessToken });
+          await chrome.storage.local.set({ accessToken });
         }
       } else if (!accessToken) {
         console.log("Access token is null");
         accessToken = await getAppAccessToken();
-        chrome.storage.local.set({ accessToken });
+        await chrome.storage.local.set({ accessToken });
       }
 
       if (followedChannels.length === 0) return;
       const live = await getStreamersLive(followedChannels, accessToken);
-      chrome.storage.local.set({ liveChannels: live });
+      await chrome.storage.local.set({ liveChannels: live });
       chrome.action.setBadgeBackgroundColor({ color: "#9146FF" });
       chrome.action.setBadgeText({ text: live ? live.length.toString() : "0" });
       console.log("streamers live: ", live);
