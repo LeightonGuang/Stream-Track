@@ -1,203 +1,48 @@
-import axios from "axios";
+import getUserId from "../../utils/twitchApi/getUserId";
 import { TwitchIcon, YouTubeIcon } from "../../public/icons";
-import generateRandomState from "../../utils/generateRandomState";
+import getAppAccessToken from "../../utils/twitchApi/getAppAccessToken";
+import getFollowedChannels from "../../utils/twitchApi/getFollowedChannels";
+import getStreamersProfilePics from "../../utils/twitchApi/getStreamersProfilePics";
 
-interface ManifestType {
-  oauth2?: {
-    client_id: string;
-    scopes: string[];
-    redirect_uri: string;
-  };
-}
+import { ManifestType } from "../../../types/manifestType";
 
-interface FollowedChannelsType {
-  broadcaster_id: string;
-  broadcaster_name: string;
-}
+// TODO : Options to turn off stream preview
 
 const SettingsTab = () => {
   const manifest = chrome.runtime.getManifest() as ManifestType;
+  const version = manifest.version;
+  console.log(version);
   const clientId = manifest.oauth2?.client_id;
-  const redirectUri = chrome.identity.getRedirectURL();
 
   const handleTwitchLoginButton = async () => {
     // get list of user's followed channels and store in chrome storage
-
-    const getAccessToken = async (): Promise<string | null> => {
-      // launch web auth flow to get access token
-      return new Promise((resolve, reject) => {
-        const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=user:read:follows&state=${generateRandomState()}`;
-        chrome.identity.launchWebAuthFlow(
-          { url: authUrl, interactive: true },
-          (redirectUrl) => {
-            if (chrome.runtime.lastError) {
-              console.error(chrome.runtime.lastError.message);
-              reject(chrome.runtime.lastError.message);
-              return;
-            }
-
-            if (redirectUrl) {
-              const params = new URLSearchParams(
-                new URL(redirectUrl).hash.substring(1),
-              );
-              const accessToken = params.get("access_token");
-              resolve(accessToken || null);
-            } else {
-              reject("No redirect URL found");
-            }
-          },
-        );
-      });
-    };
-
-    const getUserId = async (accessToken: string) => {
-      try {
-        const response: { data: { data: any[] } } = await axios.get(
-          "https://api.twitch.tv/helix/users",
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Client-Id": clientId,
-            },
-          },
-        );
-
-        const userId = response.data.data[0].id;
-        return userId;
-      } catch (error) {
-        console.error("Error fetching user ID:", error);
-      }
-    };
-
-    const getFollowedChannels = async (userId: string, accessToken: string) => {
-      interface FollowingsType {
-        total: number;
-        data: any[];
-        pagination: { cursor: string | null };
-      }
-
-      try {
-        const followings: FollowedChannelsType[] = [];
-        let cursor = null;
-
-        do {
-          const response: { data: FollowingsType } = await axios.get(
-            "https://api.twitch.tv/helix/channels/followed",
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Client-Id": clientId,
-              },
-              params: {
-                user_id: userId,
-                first: 100,
-                after: cursor,
-              },
-            },
-          );
-
-          cursor = response.data.pagination.cursor || null;
-
-          followings.push(
-            ...response.data.data.map(
-              ({ broadcaster_id, broadcaster_name }) => ({
-                broadcaster_id,
-                broadcaster_name,
-              }),
-            ),
-          );
-        } while (cursor);
-
-        return followings;
-      } catch (error) {
-        console.error("Error fetching followed channels:", error);
-        return [];
-      }
-    };
-
-    const getStreamersProfilePics = async (
-      followedChannels: FollowedChannelsType[],
-      accessToken: string,
-    ) => {
-      interface ChannelDataType {
-        id: string;
-        display_name: string;
-        profile_image_url: string;
-      }
-
-      try {
-        const chunkSize = 100;
-
-        const chunks = Array.from(
-          { length: Math.ceil(followedChannels.length / chunkSize) },
-          (_, i) =>
-            followedChannels
-              .slice(i * chunkSize, i * chunkSize + chunkSize)
-              .map((channel) => channel.broadcaster_id),
-        );
-
-        const responses = await Promise.all(
-          chunks.map(async (ids) => {
-            const response: { data: { data: any[] } } = await axios.get(
-              "https://api.twitch.tv/helix/users",
-              {
-                headers: {
-                  Authorization: `Bearer ${accessToken}`,
-                  "Client-Id": clientId,
-                },
-                params: { id: ids },
-                paramsSerializer: (params) =>
-                  Object.entries(params)
-                    .flatMap(([key, value]) =>
-                      Array.isArray(value)
-                        ? value.map((v) => `${key}=${encodeURIComponent(v)}`)
-                        : `${key}=${encodeURIComponent(value)}`,
-                    )
-                    .join("&"),
-              },
-            );
-
-            return response.data.data.map(
-              ({ id, display_name, profile_image_url }: ChannelDataType) => ({
-                id,
-                display_name,
-                profile_image_url,
-              }),
-            );
-          }),
-        );
-
-        const allProfiles = responses.flat();
-        return allProfiles;
-      } catch (error) {
-        console.error("Error fetching streamers profile pics:", error);
-      }
-    };
-
     try {
-      const accessToken = await getAccessToken();
+      const accessToken = await getAppAccessToken();
       if (!accessToken) {
         console.error("No access token");
         return;
       }
 
-      const userId = await getUserId(accessToken);
-      chrome.storage.local.set({ userId });
+      const userId = await getUserId(clientId, accessToken);
+      await chrome.storage.local.set({ userId });
       if (!userId) {
         console.error("No user id");
         return;
       }
 
       const allFollowedChannels = await getFollowedChannels(
+        clientId,
         userId,
         accessToken,
       );
 
       const channelData = await getStreamersProfilePics(
         allFollowedChannels,
+        clientId,
         accessToken,
       );
-      chrome.storage.local.set({ followedChannels: channelData });
+
+      await chrome.storage.local.set({ followedChannels: channelData });
     } catch (error) {
       console.error("Error during login flow", error);
     }
