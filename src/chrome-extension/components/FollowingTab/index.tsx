@@ -62,7 +62,7 @@ const FollowingTab = () => {
   }, [followedChannels]);
 
   return (
-    <div className="flex h-min max-h-[calc(2.65rem*10)] flex-col items-center overflow-y-auto">
+    <div className="flex h-min max-h-[calc(2.65rem*10)] flex-col items-center overflow-y-auto overflow-x-hidden">
       {!isLoading
         ? liveChannels.map((liveChannelData: LiveChannelType) => {
             const channelData = followedChannels.find(
