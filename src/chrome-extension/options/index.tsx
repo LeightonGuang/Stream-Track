@@ -1,9 +1,8 @@
 import "../global.css";
 import { useEffect, useState } from "react";
-import StreamerCard from "../components/StreamerCard";
+import SettingsTab from "../components/settingsTab";
+import FollowingTab from "../components/FollowingTab";
 
-import { LiveChannelType } from "../../types/liveChannelType";
-import { LocalSettingsType } from "../../types/LocalSettingsType";
 import { ChromeStorageFollowedChannelsType } from "../../types/ChromeStorageFollowedChannelsType";
 
 const Options = () => {
@@ -13,10 +12,6 @@ const Options = () => {
   const [followedChannels, setFollowedChannels] = useState<
     ChromeStorageFollowedChannelsType[]
   >([]);
-  const [liveChannels, setLiveChannels] = useState<LiveChannelType[]>([]);
-  const [localSettings, setLocalSettings] = useState<LocalSettingsType>(
-    {} as LocalSettingsType,
-  );
 
   const handleRemoveButton = (channelId: string) => {
     const streamer = followedChannels.find((obj) => obj.id === channelId);
@@ -35,26 +30,15 @@ const Options = () => {
 
   useEffect(() => {
     const fetchLocalData = async () => {
-      const { followedChannels, liveChannels, localSettings } =
-        await chrome.storage.local.get([
-          "followedChannels",
-          "liveChannels",
-          "localSettings",
-        ]);
+      const { followedChannels } = await chrome.storage.local.get([
+        "followedChannels",
+      ]);
 
       setFollowedChannels(followedChannels);
-      setLiveChannels(liveChannels);
-      setLocalSettings(localSettings);
     };
 
     fetchLocalData();
   }, []);
-
-  useEffect(() => {
-    console.log("followedChannels: ", followedChannels);
-    console.log("liveChannels: ", liveChannels);
-    console.log("localSettings: ", localSettings);
-  }, [localSettings]);
 
   return (
     <div className="max-w-dvw flex h-full flex-col">
@@ -88,7 +72,7 @@ const Options = () => {
           switch (activeTab) {
             case "followedChannels": {
               return (
-                <div className="flex h-full w-full flex-col justify-center gap-2">
+                <div className="flex h-full w-full justify-center">
                   <div className="flex w-full justify-center">
                     <div className="h-[calc(100dvh-4rem)] overflow-y-auto">
                       <table className="mr-2 table-auto border border-white">
@@ -152,28 +136,14 @@ const Options = () => {
             case "liveChannels": {
               return (
                 <div className="flex h-full w-full justify-center">
-                  <div>
-                    {liveChannels.map((liveChannelData: LiveChannelType) => {
-                      const channelData = followedChannels.find(
-                        (channel) => channel.id === liveChannelData.user_id,
-                      );
-
-                      return (
-                        <StreamerCard
-                          key={liveChannelData.user_id}
-                          liveChannelData={liveChannelData}
-                          channelData={channelData}
-                        />
-                      );
-                    })}
-                  </div>
+                  <FollowingTab />
                 </div>
               );
             }
             case "localSettings": {
               return (
-                <div className="h-full w-full">
-                  <h2>Local Settings</h2>
+                <div className="flex h-full w-full justify-center">
+                  <SettingsTab />
                 </div>
               );
             }
