@@ -13,7 +13,7 @@ const Options = () => {
     ChromeStorageFollowedChannelsType[]
   >([]);
 
-  const handleRemoveButton = (channelId: string) => {
+  const handleRemoveButton = async (channelId: string): Promise<void> => {
     const streamer = followedChannels.find((obj) => obj.id === channelId);
 
     if (
@@ -22,7 +22,12 @@ const Options = () => {
 (This will not affect your following list on twitch.tv)`,
       )
     ) {
-      console.log("Remove button clicked");
+      const newFollowedChannels = followedChannels.filter(
+        (obj) => obj.id !== channelId,
+      );
+
+      setFollowedChannels(newFollowedChannels);
+      await chrome.storage.local.set({ followedChannels: newFollowedChannels });
     } else {
       console.log("Cancel button clicked");
     }
