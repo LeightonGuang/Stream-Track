@@ -1,5 +1,6 @@
 import "../global.css";
 import { useEffect, useState } from "react";
+import StreamerCard from "../components/StreamerCard";
 
 import { LiveChannelType } from "../../types/liveChannelType";
 import { LocalSettingsType } from "../../types/LocalSettingsType";
@@ -56,7 +57,7 @@ const Options = () => {
   }, [localSettings]);
 
   return (
-    <div className="max-w-dvw flex flex-col">
+    <div className="max-w-dvw flex h-full flex-col">
       <div className="flex h-[3.125rem] w-full items-center justify-between bg-[#18181a]">
         <div className="h-full text-lg font-semibold">
           <button
@@ -82,7 +83,7 @@ const Options = () => {
         <h2 className="px-[1.25rem] text-sm text-gray-500">Local Data</h2>
       </div>
 
-      <div>
+      <div className="h-full w-full">
         {(() => {
           switch (activeTab) {
             case "followedChannels": {
@@ -150,8 +151,22 @@ const Options = () => {
             }
             case "liveChannels": {
               return (
-                <div className="h-full w-full">
-                  <h2>Live Channels</h2>
+                <div className="flex h-full w-full justify-center">
+                  <div>
+                    {liveChannels.map((liveChannelData: LiveChannelType) => {
+                      const channelData = followedChannels.find(
+                        (channel) => channel.id === liveChannelData.user_id,
+                      );
+
+                      return (
+                        <StreamerCard
+                          key={liveChannelData.user_id}
+                          liveChannelData={liveChannelData}
+                          channelData={channelData}
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
               );
             }
