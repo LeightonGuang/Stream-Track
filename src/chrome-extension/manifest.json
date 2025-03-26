@@ -18,5 +18,21 @@
     "client_id": "z5gia7a4ohqd22biljf6c6h0ukj2fk",
     "scopes": ["user:read:follows"]
   },
-  "permissions": ["identity", "storage", "alarms"]
+  "permissions": ["identity", "storage", "alarms"],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/chrome-extension/public/fonts/Inter_24pt-Thin.ttf",
+        "src/chrome-extension/public/fonts/Inter_24pt-ExtraLight.ttf",
+        "src/chrome-extension/public/fonts/Inter_24pt-Light.ttf",
+        "src/chrome-extension/public/fonts/Inter_24pt-Regular.ttf",
+        "src/chrome-extension/public/fonts/Inter_24pt-Medium.ttf",
+        "src/chrome-extension/public/fonts/Inter_24pt-SemiBold.ttf",
+        "src/chrome-extension/public/fonts/Inter_24pt-Bold.ttf",
+        "src/chrome-extension/public/fonts/Inter_24pt-ExtraBold.ttf",
+        "src/chrome-extension/public/fonts/Inter_24pt-Black.ttf"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
