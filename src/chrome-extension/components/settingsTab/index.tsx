@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import getUserId from "../../utils/twitchApi/getUserId";
 import { TwitchIcon } from "../../public/icons";
+import getUserId from "../../utils/twitchApi/getUserId";
+import lookUpWTF from "../../public/assets/lookUpWTF.png";
 import getAppAccessToken from "../../utils/twitchApi/getAppAccessToken";
 import getFollowedChannels from "../../utils/twitchApi/getFollowedChannels";
 import getStreamersProfilePics from "../../utils/twitchApi/getStreamersProfilePics";
@@ -98,7 +99,7 @@ const SettingsTab = () => {
   }, [localSettingsState]);
 
   return (
-    <div className="flex h-[calc(2.65rem*10)] max-h-[calc(2.65rem*10)] w-dvw bg-background">
+    <div className="flex h-max max-h-[calc(2.65rem*10)] w-dvw max-w-[15rem] bg-background">
       <div className="w-full p-2">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold">Settings</h2>
@@ -130,14 +131,14 @@ const SettingsTab = () => {
               htmlFor="streamPreview"
             >
               <input
-                className="cursor-pointer"
+                className="h-min w-min cursor-pointer"
                 type="checkbox"
                 id="streamPreview"
                 name="streamPreview"
                 checked={localSettingsState.streamPreview}
                 onChange={handleStreamPreviewToggle}
               />
-              Stream Preview
+              <span className="whitespace-nowrap">Stream Preview</span>
             </label>
 
             <p className="flex flex-wrap whitespace-normal text-xs text-gray-500">
@@ -145,6 +146,8 @@ const SettingsTab = () => {
             </p>
           </div>
         </div>
+
+        <img alt="emote" className="mt-4 w-8 object-cover" src={lookUpWTF} />
       </div>
     </div>
   );
