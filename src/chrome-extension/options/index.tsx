@@ -1,9 +1,170 @@
 import "../global.css";
+import { useEffect, useState } from "react";
+
+import { LiveChannelType } from "../../types/liveChannelType";
+import { LocalSettingsType } from "../../types/LocalSettingsType";
+import { ChromeStorageFollowedChannelsType } from "../../types/ChromeStorageFollowedChannelsType";
 
 const Options = () => {
+  const [activeTab, setActiveTab] = useState<
+    "followedChannels" | "liveChannels" | "localSettings"
+  >("followedChannels");
+  const [followedChannels, setFollowedChannels] = useState<
+    ChromeStorageFollowedChannelsType[]
+  >([]);
+  const [liveChannels, setLiveChannels] = useState<LiveChannelType[]>([]);
+  const [localSettings, setLocalSettings] = useState<LocalSettingsType>(
+    {} as LocalSettingsType,
+  );
+
+  const handleRemoveButton = (channelId: string) => {
+    const streamer = followedChannels.find((obj) => obj.id === channelId);
+
+    if (
+      window.confirm(
+        `Are you sure you want to remove **${streamer?.display_name}** from your following list? 
+(This will not affect your following list on twitch.tv)`,
+      )
+    ) {
+      console.log("Remove button clicked");
+    } else {
+      console.log("Cancel button clicked");
+    }
+  };
+
+  useEffect(() => {
+    const fetchLocalData = async () => {
+      const { followedChannels, liveChannels, localSettings } =
+        await chrome.storage.local.get([
+          "followedChannels",
+          "liveChannels",
+          "localSettings",
+        ]);
+
+      setFollowedChannels(followedChannels);
+      setLiveChannels(liveChannels);
+      setLocalSettings(localSettings);
+    };
+
+    fetchLocalData();
+  }, []);
+
+  useEffect(() => {
+    console.log("followedChannels: ", followedChannels);
+    console.log("liveChannels: ", liveChannels);
+    console.log("localSettings: ", localSettings);
+  }, [localSettings]);
+
   return (
-    <div className="text-5xl p-10 font-extrabold">
-      <div>This is your options page.</div>
+    <div className="max-w-dvw flex flex-col">
+      <div className="flex h-[3.125rem] w-full items-center justify-between bg-[#18181a]">
+        <div className="h-full text-lg font-semibold">
+          <button
+            className={`h-full border-b-[0.125rem] border-[#18181a] px-[1.25rem] ${activeTab === "followedChannels" && "border-[#bc98f1] text-[#bc98f1]"}`}
+            onClick={() => setActiveTab("followedChannels")}
+          >
+            Followed Channels
+          </button>
+          <button
+            className={`h-full border-b-[0.125rem] border-[#18181a] px-[1.25rem] ${activeTab === "liveChannels" && "border-[#bc98f1] text-[#bc98f1]"}`}
+            onClick={() => setActiveTab("liveChannels")}
+          >
+            Live Channels
+          </button>
+          <button
+            className={`h-full border-b-[0.125rem] border-[#18181a] px-[1.25rem] ${activeTab === "localSettings" && "border-[#bc98f1] text-[#bc98f1]"}`}
+            onClick={() => setActiveTab("localSettings")}
+          >
+            Settings
+          </button>
+        </div>
+
+        <h2 className="px-[1.25rem] text-sm text-gray-500">Local Data</h2>
+      </div>
+
+      <div>
+        {(() => {
+          switch (activeTab) {
+            case "followedChannels": {
+              return (
+                <div className="flex h-full w-full flex-col justify-center gap-2">
+                  <div className="flex w-full justify-center">
+                    <div className="h-[calc(100dvh-4rem)] overflow-y-auto">
+                      <table className="mr-2 table-auto border border-white">
+                        <thead>
+                          <tr>
+                            <th className="whitespace-nowrap py-4 pr-2 text-left">
+                              Profile Pic
+                            </th>
+                            <th className="whitespace-nowrap py-4 pr-2 text-left">
+                              Name
+                            </th>
+                            <th className="whitespace-nowrap py-4 pr-2 text-left">
+                              Id
+                            </th>
+                            <th className="whitespace-nowrap py-4 pr-2 text-left">
+                              Action
+                            </th>
+                          </tr>
+                        </thead>
+
+                        <tbody>
+                          {followedChannels.map((channel) => (
+                            <tr
+                              className="border border-white"
+                              key={channel.id}
+                            >
+                              <td className="pr-2">
+                                <img
+                                  src={channel.profile_image_url}
+                                  alt={channel.display_name}
+                                  className="m-1 h-8 w-8 rounded-full"
+                                />
+                              </td>
+                              <td className="pr-2">
+                                <a
+                                  className="hover:border-b hover:border-[#a970ff]"
+                                  href={`https://twitch.tv/${channel.display_name}`}
+                                  target="_blank"
+                                >
+                                  {channel.display_name}
+                                </a>
+                              </td>
+                              <td className="pr-2">{channel.id}</td>
+                              <td className="pr-2">
+                                <button
+                                  className="rounded-l-full rounded-r-full bg-red-500 px-2 py-1"
+                                  onClick={() => handleRemoveButton(channel.id)}
+                                >
+                                  Remove
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+            case "liveChannels": {
+              return (
+                <div className="h-full w-full">
+                  <h2>Live Channels</h2>
+                </div>
+              );
+            }
+            case "localSettings": {
+              return (
+                <div className="h-full w-full">
+                  <h2>Local Settings</h2>
+                </div>
+              );
+            }
+          }
+        })()}
+      </div>
     </div>
   );
 };
