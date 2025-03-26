@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import getUserId from "../../utils/twitchApi/getUserId";
-import { TwitchIcon, YouTubeIcon } from "../../public/icons";
+import { TwitchIcon } from "../../public/icons";
 import getAppAccessToken from "../../utils/twitchApi/getAppAccessToken";
 import getFollowedChannels from "../../utils/twitchApi/getFollowedChannels";
 import getStreamersProfilePics from "../../utils/twitchApi/getStreamersProfilePics";
@@ -52,9 +52,9 @@ const SettingsTab = () => {
     }
   };
 
-  const handleYoutubeLoginButton = () => {
-    console.log("Youtube button clicked");
-  };
+  // const handleYoutubeLoginButton = () => {
+  //   console.log("Youtube button clicked");
+  // };
 
   const handleStreamPreviewToggle = async () => {
     setLocalSettingsState({
@@ -90,7 +90,6 @@ const SettingsTab = () => {
         console.error("Error fetching and setting local settings", error);
       }
     };
-
     fetchAndSetLocalSettings();
   }, []);
 
@@ -99,11 +98,10 @@ const SettingsTab = () => {
   }, [localSettingsState]);
 
   return (
-    <div className="flex h-min max-h-[calc(2.65rem*10)] w-dvw">
+    <div className="flex h-[calc(2.65rem*10)] max-h-[calc(2.65rem*10)] w-dvw bg-background">
       <div className="w-full p-2">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold">Settings</h2>
-
           <span className="text-xs text-gray-500">v{version}</span>
         </div>
 
@@ -115,28 +113,36 @@ const SettingsTab = () => {
             <TwitchIcon className="w-4" />
             <span className="font-medium">Login with Twitch</span>
           </button>
-
+          {/* 
           <button
             className="flex w-max gap-1 rounded-md bg-youtube px-2 py-1"
             onClick={handleYoutubeLoginButton}
           >
             <YouTubeIcon className="w-4" />
             <span className="font-medium">Login with Youtube</span>
-          </button>
+          </button> */}
         </div>
 
         <div className="mt-2 flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="streamPreview"
-              name="streamPreview"
-              checked={localSettingsState.streamPreview}
-              onChange={handleStreamPreviewToggle}
-            />
-            <label className="text-sm" htmlFor="streamPreview">
+          <div className="flex flex-col">
+            <label
+              className="flex w-min cursor-pointer items-center gap-2 text-sm"
+              htmlFor="streamPreview"
+            >
+              <input
+                className="cursor-pointer"
+                type="checkbox"
+                id="streamPreview"
+                name="streamPreview"
+                checked={localSettingsState.streamPreview}
+                onChange={handleStreamPreviewToggle}
+              />
               Stream Preview
             </label>
+
+            <p className="flex flex-wrap whitespace-normal text-xs text-gray-500">
+              Hover on streamer card to show stream preview.
+            </p>
           </div>
         </div>
       </div>
