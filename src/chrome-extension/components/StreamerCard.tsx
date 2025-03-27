@@ -97,7 +97,10 @@ const StreamerCard = ({
             </div>
           </div>
         ) : (
-          <div className="flex w-[15rem] max-w-[15rem] items-center bg-[#1f1e22] px-[0.625rem] py-[0.3125rem] hover:bg-[#302f35]">
+          <div
+            className="flex w-[15rem] max-w-[15rem] items-center bg-[#1f1e22] px-[0.625rem] py-[0.3125rem] hover:bg-[#302f35]"
+            title={liveChannelData.title}
+          >
             <img
               alt={channelData.display_name}
               className="h-[1.875rem] w-[1.875rem] rounded-full"
@@ -108,7 +111,6 @@ const StreamerCard = ({
                 <p className="flex-shrink text-[0.875rem] font-semibold leading-[1.05rem] text-[#dedee3]">
                   {channelData.display_name}
                 </p>
-
                 <p className="max-w-[8.4375rem] overflow-x-clip truncate text-[0.8125rem] font-normal leading-[0.975rem] text-[#adadb8]">
                   {liveChannelData.game_name}
                 </p>
