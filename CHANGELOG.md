@@ -2,6 +2,8 @@
 
 ## 1.1.0 (26-03-2025)
 
+- Added stream title tooltip when hovering over streamer card.
+- Added sorting options for live channels.
 - Added remove button for local data followed channels.
 - Updated options page to manage local data.
 - Added font Inter.
