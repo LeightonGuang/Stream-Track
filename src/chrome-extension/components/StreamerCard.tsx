@@ -48,7 +48,7 @@ const StreamerCard = ({
         onMouseLeave={() => setIsHover(false)}
       >
         {isHover && localSettings.streamPreview ? (
-          <div className="flex w-full flex-col overflow-x-hidden bg-[#0e0e10] px-[0.625rem] py-[0.3125rem]">
+          <div className="flex w-[15rem] max-w-[15rem] flex-col overflow-x-hidden bg-[#0e0e10] px-[0.625rem] py-[0.3125rem]">
             <img
               alt={liveChannelData.title}
               className="w-full object-cover"
