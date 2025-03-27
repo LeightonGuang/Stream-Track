@@ -108,7 +108,7 @@ const FollowingTab = () => {
   }, [liveChannels]);
 
   return (
-    <div className="flex h-min max-h-[calc(2.65rem*10)] flex-col items-center overflow-y-auto overflow-x-hidden">
+    <div className="flex h-min flex-col items-center">
       <div className="w-full">
         <button
           className="flex w-full items-center justify-between bg-[#1f1e22] hover:bg-[#302f35]"
@@ -137,23 +137,25 @@ const FollowingTab = () => {
         </button>
       </div>
 
-      {!isLoading
-        ? sortedLiveChannels.map((liveChannelData: LiveChannelType) => {
-            const channelData = followedChannels.find(
-              (channel) =>
-                String(channel.id).trim() ===
-                String(liveChannelData.user_id).trim(),
-            );
+      <div className="flex max-h-[calc(2.65rem*10)] w-full flex-col overflow-y-auto overflow-x-hidden">
+        {!isLoading
+          ? sortedLiveChannels.map((liveChannelData: LiveChannelType) => {
+              const channelData = followedChannels.find(
+                (channel) =>
+                  String(channel.id).trim() ===
+                  String(liveChannelData.user_id).trim(),
+              );
 
-            return (
-              <StreamerCard
-                key={liveChannelData.user_id}
-                liveChannelData={liveChannelData}
-                channelData={channelData}
-              />
-            );
-          })
-        : "Loading..."}
+              return (
+                <StreamerCard
+                  key={liveChannelData.user_id}
+                  liveChannelData={liveChannelData}
+                  channelData={channelData}
+                />
+              );
+            })
+          : "Loading..."}
+      </div>
     </div>
   );
 };
