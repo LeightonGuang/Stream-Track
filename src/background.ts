@@ -6,7 +6,6 @@ const fetchLiveFlow = async () => {
   try {
     const { followedChannels } =
       await chrome.storage.local.get("followedChannels");
-    if (followedChannels.length === 0) return;
 
     let { accessToken } = await chrome.storage.local.get("accessToken");
 
@@ -14,9 +13,8 @@ const fetchLiveFlow = async () => {
       const tokenIsValid = await validateTwitchToken(accessToken);
 
       if (!tokenIsValid) {
-        console.log("Token is invalid");
-        accessToken = await getAppAccessToken();
-        await chrome.storage.local.set({ accessToken });
+        console.error("Token is invalid");
+        return;
       }
     } else if (!accessToken) {
       console.log("Access token is null");
