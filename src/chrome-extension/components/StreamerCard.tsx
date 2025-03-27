@@ -48,7 +48,7 @@ const StreamerCard = ({
         onMouseLeave={() => setIsHover(false)}
       >
         {isHover && localSettings.streamPreview ? (
-          <div className="flex w-[13.75rem] flex-col overflow-x-clip bg-[#0e0e10] px-[0.625rem] py-[0.3125rem] hover:bg-[#27262c]">
+          <div className="flex w-full flex-col overflow-x-hidden bg-[#0e0e10] px-[0.625rem] py-[0.3125rem]">
             <img
               alt={liveChannelData.title}
               className="w-full object-cover"
@@ -56,11 +56,11 @@ const StreamerCard = ({
             />
 
             <div className="w-full border-t border-[#363539]">
-              <h1 className="text-ellipsis text-sm font-semibold leading-[1.3125rem] text-[#efeff1]">
+              <h1 className="truncate text-sm font-semibold leading-[1.3125rem] text-[#efeff1]">
                 {liveChannelData.title}
               </h1>
 
-              <div className="flex gap-1">
+              <div className="flex gap-1 overflow-x-hidden">
                 {liveChannelData.tags.map((tag: string) => (
                   <div
                     key={tag}
