@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Stream Track",
   "description": "Track and stay updated on streaming activities of your favorite streamers.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "action": {
     "default_popup": "popup.html"
   },
