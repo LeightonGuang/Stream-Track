@@ -18,3 +18,8 @@ npm install
 ## Reload the extension after making changes
 
 - Open the terminal and run `nmp run build` then visit `chrome://extensions/` and click the refresh `⟳` button on your extension
+
+## Quick Note
+
+When extension is installed on new chrome browser, add a new OAuth Redirect URL on twitch developer console.
+`https://[...id].chromiumapp.org/`
