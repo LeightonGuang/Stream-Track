@@ -3,9 +3,6 @@ import { useState } from "react";
 import SettingsTab from "../components/settingsTab";
 import FollowingTab from "../components/FollowingTab";
 
-// TODO : Fix popup width and height to be responsive
-// TODO : Sort by view count, name and game
-
 export const Popup = () => {
   const [selectedTab, setSelectedTab] = useState<string>("list");
 
