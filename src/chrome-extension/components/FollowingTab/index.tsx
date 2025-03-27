@@ -1,5 +1,6 @@
 import StreamerCard from "../StreamerCard";
 import { useState, useEffect } from "react";
+import { SortIcon } from "../../public/icons";
 import getStreamersLive from "../../utils/twitchApi/getStreamersLive";
 import getAppAccessToken from "../../utils/twitchApi/getAppAccessToken";
 import validateTwitchToken from "../../utils/twitchApi/validateTwitchToken";
@@ -13,7 +14,48 @@ const FollowingTab = () => {
   const [followedChannels, setFollowedChannels] = useState<
     ChromeStorageFollowedChannelsType[]
   >([]);
-  const [liveChannels, setLiveChannels] = useState<any[]>([]);
+  const [liveChannels, setLiveChannels] = useState<LiveChannelType[]>([]);
+  const [sortBy, setSortBy] = useState<string>("viewers");
+  const [sortedLiveChannels, setSortedLiveChannels] = useState<
+    LiveChannelType[]
+  >([]);
+
+  const sortLiveChannel = (
+    sortCategory: string,
+    channels: LiveChannelType[],
+  ): LiveChannelType[] => {
+    if (sortCategory === "viewers") {
+      const sortedViewers = channels.sort(
+        (a, b) => b.viewer_count - a.viewer_count,
+      );
+      return sortedViewers;
+    } else if (sortCategory === "channelName") {
+      const sortedChannelName = channels.sort((a, b) =>
+        a.user_name.localeCompare(b.user_name),
+      );
+      return sortedChannelName;
+    } else if (sortCategory === "game") {
+      const sortedGame = channels.sort((a, b) =>
+        a.game_name.localeCompare(b.game_name),
+      );
+      return sortedGame;
+    } else {
+      return channels;
+    }
+  };
+
+  const handleSortButton = () => {
+    if (sortBy === "viewers") {
+      setSortBy("game");
+      setSortedLiveChannels(sortLiveChannel("game", liveChannels));
+    } else if (sortBy === "game") {
+      setSortBy("channelName");
+      setSortedLiveChannels(sortLiveChannel("channelName", liveChannels));
+    } else if (sortBy === "channelName") {
+      setSortBy("viewers");
+      setSortedLiveChannels(sortLiveChannel("viewers", liveChannels));
+    }
+  };
 
   const processTasks = async () => {
     try {
@@ -28,7 +70,7 @@ const FollowingTab = () => {
           await chrome.storage.local.set({ accessToken });
         }
       } else if (!accessToken) {
-        console.log("Access token is null");
+        console.error("Access token is null");
         accessToken = await getAppAccessToken();
         await chrome.storage.local.set({ accessToken });
       }
@@ -61,10 +103,42 @@ const FollowingTab = () => {
     setIsLoading(false);
   }, [followedChannels]);
 
+  useEffect(() => {
+    setSortedLiveChannels(sortLiveChannel(sortBy, liveChannels));
+  }, [liveChannels]);
+
   return (
     <div className="flex h-min max-h-[calc(2.65rem*10)] flex-col items-center overflow-y-auto overflow-x-hidden">
+      <div className="w-full">
+        <button
+          className="flex w-full items-center justify-between bg-[#1f1e22] hover:bg-[#302f35]"
+          onClick={() => {
+            handleSortButton();
+          }}
+        >
+          <div className="m-[0.625rem] flex flex-col items-start">
+            <h3 className="text-[0.8125rem] font-semibold leading-[0.975rem] text-[#EFEFF1]">
+              FOLLOWED CHANNELS
+            </h3>
+            <p className="text-[0.8125rem] font-normal leading-[1.2188rem] text-[#ADADB8]">
+              {sortBy === "viewers"
+                ? "Viewers (High to Low)"
+                : sortBy === "channelName"
+                  ? "Channel Name (A-Z)"
+                  : sortBy === "game"
+                    ? "Game (A-Z)"
+                    : ""}
+            </p>
+          </div>
+
+          <div className="mr-[0.625rem] h-[1.25rem] w-[1.25rem] pr-[0.3125rem]">
+            <SortIcon className="h-[1.25rem] w-[1.25rem] text-white" />
+          </div>
+        </button>
+      </div>
+
       {!isLoading
-        ? liveChannels.map((liveChannelData: LiveChannelType) => {
+        ? sortedLiveChannels.map((liveChannelData: LiveChannelType) => {
             const channelData = followedChannels.find(
               (channel) =>
                 String(channel.id).trim() ===
