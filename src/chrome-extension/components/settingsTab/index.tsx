@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { TwitchIcon } from "../../public/icons";
+import { TwitchBlackIcon } from "../../public/icons";
 import getUserId from "../../utils/twitchApi/getUserId";
 import lookUpWTF from "../../public/assets/lookUpWTF.png";
 import getAppAccessToken from "../../utils/twitchApi/getAppAccessToken";
@@ -111,7 +111,7 @@ const SettingsTab = () => {
             className="flex w-max gap-1 rounded-md bg-twitch px-2 py-1"
             onClick={handleTwitchLoginButton}
           >
-            <TwitchIcon className="w-4" />
+            <TwitchBlackIcon className="w-4" />
             <span className="font-medium">Login with Twitch</span>
           </button>
           {/* 
