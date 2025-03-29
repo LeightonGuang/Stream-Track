@@ -108,7 +108,7 @@ const StreamerCard = ({
             />
             <div className="ml-[0.625rem] flex w-[11.25rem] min-w-[11.25rem] max-w-[11.25rem]">
               <div className="flex flex-grow flex-col">
-                <p className="flex-shrink text-[0.875rem] font-semibold leading-[1.05rem] text-[#dedee3]">
+                <p className="max-w-[7.75rem] overflow-x-clip truncate text-[0.875rem] font-semibold leading-[1.05rem] text-[#dedee3]">
                   {channelData.display_name}
                 </p>
                 <p className="max-w-[8.4375rem] overflow-x-clip truncate text-[0.8125rem] font-normal leading-[0.975rem] text-[#adadb8]">
