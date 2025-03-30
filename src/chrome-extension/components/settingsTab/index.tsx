@@ -108,12 +108,13 @@ const SettingsTab = () => {
 
         <div className="mt-2 flex flex-col gap-2">
           <button
-            className="flex w-max gap-1 rounded-md bg-twitch px-2 py-1"
+            className="flex w-max gap-1 rounded-lg bg-twitch px-2 py-1"
             onClick={handleTwitchLoginButton}
           >
             <TwitchBlackIcon className="w-4" />
             <span className="font-medium">Login with Twitch</span>
           </button>
+
           {/* 
           <button
             className="flex w-max gap-1 rounded-md bg-youtube px-2 py-1"
@@ -146,6 +147,18 @@ const SettingsTab = () => {
             </p>
           </div>
         </div>
+
+        <a
+          className="my-2 flex w-max hover"
+          href="https://ko-fi.com/V7V71CLGEB"
+          target="_blank"
+        >
+          <img
+            className="h-[1.625rem] object-contain"
+            src="https://storage.ko-fi.com/cdn/kofi6.png?v=6"
+            alt="Buy Me a Coffee at ko-fi.com"
+          />
+        </a>
 
         <img alt="emote" className="mt-4 w-8 object-cover" src={lookUpWTF} />
       </div>
