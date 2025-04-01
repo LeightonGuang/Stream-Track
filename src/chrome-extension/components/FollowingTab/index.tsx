@@ -9,7 +9,6 @@ import { LiveChannelType } from "../../../types/liveChannelType";
 import { ChromeStorageFollowedChannelsType } from "../../../types/ChromeStorageFollowedChannelsType";
 
 const FollowingTab = () => {
-  const [isLoading, setIsLoading] = useState(true);
   // followedChannels is for streamers profile pictures
   const [followedChannels, setFollowedChannels] = useState<
     ChromeStorageFollowedChannelsType[]
@@ -66,11 +65,13 @@ const FollowingTab = () => {
 
         if (!tokenIsValid) {
           console.error("Token is invalid");
+          console.log("Getting new access token...");
           accessToken = await getAppAccessToken();
           await chrome.storage.local.set({ accessToken });
         }
       } else if (!accessToken) {
-        console.error("Access token is null");
+        console.log("Access token is null");
+        console.log("Getting new access token...");
         accessToken = await getAppAccessToken();
         await chrome.storage.local.set({ accessToken });
       }
@@ -100,7 +101,6 @@ const FollowingTab = () => {
 
   useEffect(() => {
     processTasks();
-    setIsLoading(false);
   }, [followedChannels]);
 
   useEffect(() => {
@@ -109,37 +109,38 @@ const FollowingTab = () => {
 
   return (
     <div className="flex h-min flex-col items-center">
-      <div className="w-full">
-        <button
-          className="flex w-full items-center justify-between bg-[#1f1e22] hover:bg-[#302f35]"
-          onClick={() => {
-            handleSortButton();
-          }}
-        >
-          <div className="m-[0.625rem] flex flex-col items-start">
-            <h3 className="text-[0.8125rem] font-semibold leading-[0.975rem] text-[#EFEFF1]">
-              FOLLOWED CHANNELS
-            </h3>
-            <p className="text-[0.8125rem] font-normal leading-[1.2188rem] text-[#ADADB8]">
-              {sortBy === "viewers"
-                ? "Viewers (High to Low)"
-                : sortBy === "channelName"
-                  ? "Channel Name (A-Z)"
-                  : sortBy === "game"
-                    ? "Game (A-Z)"
-                    : ""}
-            </p>
+      {sortedLiveChannels.length > 0 ? (
+        <>
+          <div className="w-full">
+            <button
+              className="flex w-full items-center justify-between bg-[#1f1e22] hover:bg-[#302f35]"
+              onClick={() => {
+                handleSortButton();
+              }}
+            >
+              <div className="m-[0.625rem] flex flex-col items-start">
+                <h3 className="text-[0.8125rem] font-semibold leading-[0.975rem] text-[#EFEFF1]">
+                  FOLLOWED CHANNELS
+                </h3>
+                <p className="text-[0.8125rem] font-normal leading-[1.2188rem] text-[#ADADB8]">
+                  {sortBy === "viewers"
+                    ? "Viewers (High to Low)"
+                    : sortBy === "channelName"
+                      ? "Channel Name (A-Z)"
+                      : sortBy === "game"
+                        ? "Game (A-Z)"
+                        : ""}
+                </p>
+              </div>
+
+              <div className="mr-[0.625rem] h-[1.25rem] w-[1.25rem] pr-[0.3125rem]">
+                <SortIcon className="h-[1.25rem] w-[1.25rem] text-white" />
+              </div>
+            </button>
           </div>
 
-          <div className="mr-[0.625rem] h-[1.25rem] w-[1.25rem] pr-[0.3125rem]">
-            <SortIcon className="h-[1.25rem] w-[1.25rem] text-white" />
-          </div>
-        </button>
-      </div>
-
-      <div className="flex max-h-[calc(2.65rem*10)] flex-col overflow-y-auto overflow-x-hidden">
-        {!isLoading
-          ? sortedLiveChannels.map((liveChannelData: LiveChannelType) => {
+          <div className="flex max-h-[calc(2.65rem*10)] flex-col overflow-y-auto overflow-x-hidden">
+            {sortedLiveChannels.map((liveChannelData: LiveChannelType) => {
               const channelData = followedChannels.find(
                 (channel) =>
                   String(channel.id).trim() ===
@@ -153,9 +154,14 @@ const FollowingTab = () => {
                   channelData={channelData}
                 />
               );
-            })
-          : "Loading..."}
-      </div>
+            })}
+          </div>
+        </>
+      ) : (
+        <span className="p-2 text-[0.8125rem] text-gray-500">
+          No streams are live at the moment
+        </span>
+      )}
     </div>
   );
 };
