@@ -8,7 +8,7 @@ export const Popup = () => {
   const [selectedTab, setSelectedTab] = useState<string>("list");
 
   return (
-    <div className="flex flex-col items-center whitespace-nowrap bg-background text-white">
+    <div className="flex w-60 flex-col items-center whitespace-nowrap bg-background text-white">
       <div className="flex h-[3.125rem] w-full items-center bg-[#18181a]">
         <a
           className="ml-[0.625rem] flex h-10 w-10 min-w-10 items-center justify-center p-[0.3125rem]"
