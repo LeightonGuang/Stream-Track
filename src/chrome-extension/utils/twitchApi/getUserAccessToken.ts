@@ -5,12 +5,14 @@ import { ManifestType } from "../../../types/manifestType";
 const manifest = chrome.runtime.getManifest() as ManifestType;
 const clientId = manifest.oauth2?.client_id;
 
-const getAppAccessToken = async (): Promise<string | null> => {
+const getUserAccessToken = async (
+  forceLogin: boolean,
+): Promise<string | null> => {
   try {
     console.log("getting access token");
     return new Promise((resolve, reject) => {
       const redirectUri = chrome.identity.getRedirectURL();
-      const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=user:read:follows&state=${generateRandomState()}`;
+      const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=user:read:follows&state=${generateRandomState()}${forceLogin && "&force_login=true"}`;
 
       chrome.identity.launchWebAuthFlow(
         { url: authUrl, interactive: true },
@@ -42,4 +44,4 @@ const getAppAccessToken = async (): Promise<string | null> => {
   }
 };
 
-export default getAppAccessToken;
+export default getUserAccessToken;

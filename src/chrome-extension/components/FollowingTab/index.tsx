@@ -2,7 +2,7 @@ import StreamerCard from "../StreamerCard";
 import { useState, useEffect } from "react";
 import { SortIcon } from "../../public/icons";
 import getStreamersLive from "../../utils/twitchApi/getStreamersLive";
-import getAppAccessToken from "../../utils/twitchApi/getAppAccessToken";
+import getUserAccessToken from "../../utils/twitchApi/getUserAccessToken";
 import validateTwitchToken from "../../utils/twitchApi/validateTwitchToken";
 
 import { LiveChannelType } from "../../../types/liveChannelType";
@@ -73,7 +73,7 @@ const FollowingTab = () => {
       if (!tokenIsValid) {
         console.error("Token is invalid");
         console.log("Getting new access token...");
-        const newAccessToken = await getAppAccessToken(false);
+        const newAccessToken = await getUserAccessToken(false);
         setAccessToken(newAccessToken);
         await chrome.storage.local.set({ accessToken: newAccessToken });
       }

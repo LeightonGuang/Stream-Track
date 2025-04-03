@@ -3,7 +3,7 @@ import { TwitchBlackIcon } from "../../public/icons";
 import lookUpWTF from "../../public/assets/lookUpWTF.png";
 import getUserData from "../../utils/twitchApi/getUserData";
 import getStreamersLive from "../../utils/twitchApi/getStreamersLive";
-import getAppAccessToken from "../../utils/twitchApi/getAppAccessToken";
+import getUserAccessToken from "../../utils/twitchApi/getUserAccessToken";
 import getFollowedChannels from "../../utils/twitchApi/getFollowedChannels";
 import getStreamersProfilePics from "../../utils/twitchApi/getStreamersProfilePics";
 
@@ -34,7 +34,7 @@ const SettingsTab = () => {
       // force login if not logged in
       console.log("login userData: ", userData);
       const isLoggedIn = userData !== undefined;
-      const accessToken = await getAppAccessToken(!isLoggedIn);
+      const accessToken = await getUserAccessToken(!isLoggedIn);
       await chrome.storage.local.set({ accessToken });
       if (!accessToken) throw new Error("Error getting access token");
 
