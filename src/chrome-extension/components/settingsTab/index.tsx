@@ -28,7 +28,7 @@ const SettingsTab = () => {
       if (!accessToken) throw new Error("Error getting access token");
 
       const userData = await getUserData(clientId, accessToken);
-      await chrome.storage.local.set({ userId: userData?.id });
+      await chrome.storage.local.set({ userData });
       if (!userData?.id) {
         console.error("No user id");
         return;
