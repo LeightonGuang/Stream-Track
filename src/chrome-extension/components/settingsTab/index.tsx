@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import { TwitchBlackIcon } from "../../public/icons";
-import getUserId from "../../utils/twitchApi/getUserId";
 import lookUpWTF from "../../public/assets/lookUpWTF.png";
+import getUserData from "../../utils/twitchApi/getUserData";
+import getStreamersLive from "../../utils/twitchApi/getStreamersLive";
 import getAppAccessToken from "../../utils/twitchApi/getAppAccessToken";
 import getFollowedChannels from "../../utils/twitchApi/getFollowedChannels";
 import getStreamersProfilePics from "../../utils/twitchApi/getStreamersProfilePics";
 
 import { ManifestType } from "../../../types/manifestType";
 import { LocalSettingsType } from "../../../types/LocalSettingsType";
-
-// TODO : Options to turn off stream preview
 
 const SettingsTab = () => {
   const manifest = chrome.runtime.getManifest() as ManifestType;
@@ -18,26 +17,26 @@ const SettingsTab = () => {
 
   const [localSettingsState, setLocalSettingsState] =
     useState<LocalSettingsType>({} as LocalSettingsType);
+  const [showClearDataWarningPopup, setShowClearDataWarningPopup] =
+    useState(false);
 
+  // get list of user's followed channels and store in chrome storage then fetch live channels
   const handleTwitchLoginButton = async () => {
-    // get list of user's followed channels and store in chrome storage
     try {
-      const accessToken = await getAppAccessToken();
-      if (!accessToken) {
-        console.error("No access token");
-        return;
-      }
+      const accessToken = await getAppAccessToken(true);
+      await chrome.storage.local.set({ accessToken });
+      if (!accessToken) throw new Error("Error getting access token");
 
-      const userId = await getUserId(clientId, accessToken);
-      await chrome.storage.local.set({ userId });
-      if (!userId) {
+      const userData = await getUserData(clientId, accessToken);
+      await chrome.storage.local.set({ userId: userData?.id });
+      if (!userData?.id) {
         console.error("No user id");
         return;
       }
 
       const allFollowedChannels = await getFollowedChannels(
         clientId,
-        userId,
+        userData.id,
         accessToken,
       );
 
@@ -48,14 +47,30 @@ const SettingsTab = () => {
       );
 
       await chrome.storage.local.set({ followedChannels: channelData });
+
+      const liveChannels = await getStreamersLive(channelData, accessToken);
+      if (liveChannels.length > 0) {
+        chrome.action.setBadgeBackgroundColor({ color: "#9146ff" });
+        chrome.action.setBadgeText({ text: liveChannels.length.toString() });
+        await chrome.storage.local.set({ liveChannels: liveChannels });
+      }
     } catch (error) {
       console.error("Error during login flow", error);
     }
   };
 
-  // const handleYoutubeLoginButton = () => {
-  //   console.log("Youtube button clicked");
-  // };
+  const handleClearStorage = async () => {
+    await chrome.storage.local.remove([
+      "userId",
+      "accessToken",
+      "liveChannels",
+      "followedChannels",
+    ]);
+    chrome.action.setBadgeText({ text: "" });
+    console.log("Storage cleared");
+
+    setShowClearDataWarningPopup(false);
+  };
 
   const handleStreamPreviewToggle = async () => {
     setLocalSettingsState({
@@ -114,18 +129,9 @@ const SettingsTab = () => {
             <TwitchBlackIcon className="w-4" />
             <span className="font-medium">Login with Twitch</span>
           </button>
-
-          {/* 
-          <button
-            className="flex w-max gap-1 rounded-md bg-youtube px-2 py-1"
-            onClick={handleYoutubeLoginButton}
-          >
-            <YouTubeIcon className="w-4" />
-            <span className="font-medium">Login with Youtube</span>
-          </button> */}
         </div>
 
-        <div className="mt-2 flex flex-col gap-2">
+        <div className="my-2 flex flex-col gap-2">
           <div className="flex flex-col">
             <label
               className="flex w-min cursor-pointer items-center gap-2 text-sm"
@@ -148,8 +154,47 @@ const SettingsTab = () => {
           </div>
         </div>
 
+        {showClearDataWarningPopup ? (
+          <div className="flex flex-col gap-2 rounded-lg border border-red-800 p-1">
+            <p className="whitespace-pre-wrap text-xs">
+              Are you sure you want to clear all data?
+              <span className="text-red-700">
+                (This will remove all saved streamer information and log you out
+                of Twitch.)
+              </span>
+            </p>
+
+            <div className="flex gap-2">
+              <button
+                className="w-full rounded-lg bg-gray-700 py-1 font-medium hover:bg-gray-800"
+                onClick={() => {
+                  setShowClearDataWarningPopup(false);
+                }}
+              >
+                Cancel
+              </button>
+
+              <button
+                className="w-full rounded-lg bg-red-600 py-1 font-medium hover:bg-red-700"
+                onClick={handleClearStorage}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            className="w-max rounded-lg bg-red-600 px-2 py-1 font-medium"
+            onClick={() => {
+              setShowClearDataWarningPopup(true);
+            }}
+          >
+            Clear All Data
+          </button>
+        )}
+
         <a
-          className="my-2 flex w-max hover"
+          className="hover my-2 flex w-max"
           href="https://ko-fi.com/V7V71CLGEB"
           target="_blank"
         >
