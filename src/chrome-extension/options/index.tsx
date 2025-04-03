@@ -79,14 +79,17 @@ const Options = () => {
             case "followedChannels": {
               return (
                 <div className="flex h-full w-full justify-center">
-                  <div className="flex w-full justify-center">
+                  <div className="flex w-full items-center justify-center gap-4">
                     <div className="h-[calc(100dvh-4rem)] overflow-y-auto">
                       {followedChannels.length > 0 ? (
                         <table className="mr-2 table-auto border border-white">
                           <thead>
                             <tr>
+                              <th className="whitespace-nowrap px-2 py-4 text-left">
+                                no.
+                              </th>
                               <th className="whitespace-nowrap py-4 pr-2 text-left">
-                                Profile Pic
+                                Profile
                               </th>
                               <th className="whitespace-nowrap py-4 pr-2 text-left">
                                 Name
@@ -102,11 +105,15 @@ const Options = () => {
 
                           <tbody>
                             {followedChannels.map(
-                              (channel: ChromeStorageFollowedChannelsType) => (
+                              (
+                                channel: ChromeStorageFollowedChannelsType,
+                                index: number,
+                              ) => (
                                 <tr
                                   className="border border-white"
                                   key={channel.id}
                                 >
+                                  <td className="px-2">{index + 1}</td>
                                   <td className="pr-2">
                                     <img
                                       src={channel.profile_image_url}
@@ -145,6 +152,13 @@ const Options = () => {
                         </div>
                       )}
                     </div>
+
+                    <p className="w-64 text-gray-500">
+                      If you accidentally deleted a followed channel, you can
+                      restore them by clicking on the "Login with Twitch" button
+                      in the settings tab. This will refresh your followed
+                      channels from Twitch.
+                    </p>
                   </div>
                 </div>
               );
