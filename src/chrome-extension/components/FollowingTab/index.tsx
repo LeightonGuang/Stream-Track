@@ -90,8 +90,7 @@ const FollowingTab = () => {
       await chrome.storage.local.set({ liveChannels: live });
       chrome.action.setBadgeBackgroundColor({ color: "#9146FF" });
       chrome.action.setBadgeText({ text: live ? live.length.toString() : "0" });
-      console.log("streamers live: ", live);
-      setLiveChannels(live ?? []);
+      setLiveChannels(live);
     } catch (error) {
       console.error("Error running processTasks: ", error);
     }
@@ -99,12 +98,17 @@ const FollowingTab = () => {
 
   useEffect(() => {
     const fetchLocalData = async () => {
-      const { liveChannels, followedChannels } = await chrome.storage.local.get(
-        ["liveChannels", "followedChannels"],
-      );
+      const {
+        liveChannels: localLiveChannels,
+        followedChannels: localFollowedChannels,
+      } = await chrome.storage.local.get(["liveChannels", "followedChannels"]);
 
-      if (liveChannels) setLiveChannels(liveChannels);
-      if (followedChannels) setFollowedChannels(followedChannels);
+      if (localLiveChannels) {
+        setLiveChannels(localLiveChannels);
+        const sortedLiveChannels = sortLiveChannel(sortBy, localLiveChannels);
+        setSortedLiveChannels(sortedLiveChannels);
+      }
+      if (localFollowedChannels) setFollowedChannels(localFollowedChannels);
     };
     fetchLocalData();
   }, []);
@@ -115,9 +119,10 @@ const FollowingTab = () => {
 
   // sort liveChannels whenever liveChannels updates
   useEffect(() => {
+    if (liveChannels.length === 0) return;
     const sortedLiveChannels = sortLiveChannel(sortBy, liveChannels);
     setSortedLiveChannels(sortedLiveChannels);
-  }, [liveChannels]);
+  }, [liveChannels, sortBy]);
 
   return (
     <div className="flex h-min flex-col items-center">
