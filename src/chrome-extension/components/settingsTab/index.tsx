@@ -46,6 +46,11 @@ const SettingsTab = () => {
         accessToken,
       );
 
+      if (!channelData) {
+        console.error("No channel data");
+        return;
+      }
+
       await chrome.storage.local.set({ followedChannels: channelData });
 
       const liveChannels = await getStreamersLive(channelData, accessToken);
