@@ -10,6 +10,7 @@ import { ChromeStorageFollowedChannelsType } from "../../../types/ChromeStorageF
 
 const FollowingTab = () => {
   // followedChannels is for streamers profile pictures
+  const [accessToken, setAccessToken] = useState<string | undefined | null>("");
   const [followedChannels, setFollowedChannels] = useState<
     ChromeStorageFollowedChannelsType[]
   >([]);
@@ -56,28 +57,36 @@ const FollowingTab = () => {
     }
   };
 
-  const processTasks = async () => {
+  const initiateProcess = async () => {
     try {
-      let { accessToken } = await chrome.storage.local.get("accessToken");
+      const { accessToken: localAccessToken } =
+        await chrome.storage.local.get("accessToken");
+      setAccessToken(localAccessToken);
 
-      if (accessToken) {
-        const tokenIsValid = await validateTwitchToken(accessToken);
-
-        if (!tokenIsValid) {
-          console.error("Token is invalid");
-          console.log("Getting new access token...");
-          accessToken = await getAppAccessToken();
-          await chrome.storage.local.set({ accessToken });
-        }
-      } else if (!accessToken) {
-        console.log("Access token is null");
-        console.log("Getting new access token...");
-        accessToken = await getAppAccessToken();
-        await chrome.storage.local.set({ accessToken });
+      if (!localAccessToken) {
+        console.log("No access token found locally");
+        return;
       }
 
-      if (followedChannels.length === 0) return;
-      const live = await getStreamersLive(followedChannels, accessToken);
+      const tokenIsValid = await validateTwitchToken(localAccessToken);
+
+      if (!tokenIsValid) {
+        console.error("Token is invalid");
+        console.log("Getting new access token...");
+        const newAccessToken = await getAppAccessToken(false);
+        setAccessToken(newAccessToken);
+        await chrome.storage.local.set({ accessToken: newAccessToken });
+      }
+
+      if (followedChannels.length === 0) {
+        console.log("No followed channels found");
+        chrome.action.setBadgeBackgroundColor({ color: "#9146FF" });
+        chrome.action.setBadgeText({ text: "0" });
+        setLiveChannels([]);
+        return;
+      }
+
+      const live = await getStreamersLive(followedChannels, localAccessToken);
       await chrome.storage.local.set({ liveChannels: live });
       chrome.action.setBadgeBackgroundColor({ color: "#9146FF" });
       chrome.action.setBadgeText({ text: live ? live.length.toString() : "0" });
@@ -93,18 +102,21 @@ const FollowingTab = () => {
       const { liveChannels, followedChannels } = await chrome.storage.local.get(
         ["liveChannels", "followedChannels"],
       );
-      setLiveChannels(liveChannels ?? []);
-      setFollowedChannels(followedChannels ?? []);
+
+      if (liveChannels) setLiveChannels(liveChannels);
+      if (followedChannels) setFollowedChannels(followedChannels);
     };
     fetchLocalData();
   }, []);
 
   useEffect(() => {
-    processTasks();
+    initiateProcess();
   }, [followedChannels]);
 
+  // sort liveChannels whenever liveChannels updates
   useEffect(() => {
-    setSortedLiveChannels(sortLiveChannel(sortBy, liveChannels));
+    const sortedLiveChannels = sortLiveChannel(sortBy, liveChannels);
+    setSortedLiveChannels(sortedLiveChannels);
   }, [liveChannels]);
 
   return (
@@ -157,10 +169,22 @@ const FollowingTab = () => {
             })}
           </div>
         </>
-      ) : (
-        <span className="p-2 text-[0.8125rem] text-gray-500">
-          No streams are live at the moment
+      ) : !accessToken ? (
+        <span className="whitespace-pre-wrap p-2 text-[0.8125rem] text-red-700">
+          It looks like you are not logged in. You can log in by going to the
+          Settings tab
         </span>
+      ) : followedChannels.length === 0 ? (
+        <span className="whitespace-pre-wrap p-2 text-[0.8125rem] text-gray-500">
+          It looks like you are not following any channels
+        </span>
+      ) : (
+        followedChannels.length > 0 &&
+        liveChannels.length === 0 && (
+          <span className="whitespace-pre-wrap p-2 text-[0.8125rem] text-gray-500">
+            It looks like none of your followed channels are live at the moment
+          </span>
+        )
       )}
     </div>
   );
