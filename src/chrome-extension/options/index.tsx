@@ -14,7 +14,7 @@ const Options = () => {
   >([]);
 
   const handleRemoveButton = async (channelId: string): Promise<void> => {
-    const streamer = followedChannels.find((obj) => obj.id === channelId);
+    const streamer = followedChannels?.find((obj) => obj.id === channelId);
 
     if (
       window.confirm(
@@ -22,7 +22,7 @@ const Options = () => {
 (This will not affect your following list on twitch.tv)`,
       )
     ) {
-      const newFollowedChannels = followedChannels.filter(
+      const newFollowedChannels = followedChannels?.filter(
         (obj) => obj.id !== channelId,
       );
 
@@ -39,6 +39,7 @@ const Options = () => {
         "followedChannels",
       ]);
 
+      console.log(followedChannels);
       setFollowedChannels(followedChannels);
     };
 
@@ -80,59 +81,69 @@ const Options = () => {
                 <div className="flex h-full w-full justify-center">
                   <div className="flex w-full justify-center">
                     <div className="h-[calc(100dvh-4rem)] overflow-y-auto">
-                      <table className="mr-2 table-auto border border-white">
-                        <thead>
-                          <tr>
-                            <th className="whitespace-nowrap py-4 pr-2 text-left">
-                              Profile Pic
-                            </th>
-                            <th className="whitespace-nowrap py-4 pr-2 text-left">
-                              Name
-                            </th>
-                            <th className="whitespace-nowrap py-4 pr-2 text-left">
-                              Id
-                            </th>
-                            <th className="whitespace-nowrap py-4 pr-2 text-left">
-                              Action
-                            </th>
-                          </tr>
-                        </thead>
-
-                        <tbody>
-                          {followedChannels.map((channel) => (
-                            <tr
-                              className="border border-white"
-                              key={channel.id}
-                            >
-                              <td className="pr-2">
-                                <img
-                                  src={channel.profile_image_url}
-                                  alt={channel.display_name}
-                                  className="m-1 h-8 w-8 rounded-full"
-                                />
-                              </td>
-                              <td className="pr-2">
-                                <a
-                                  className="hover:border-b hover:border-[#a970ff]"
-                                  href={`https://twitch.tv/${channel.display_name}`}
-                                  target="_blank"
-                                >
-                                  {channel.display_name}
-                                </a>
-                              </td>
-                              <td className="pr-2">{channel.id}</td>
-                              <td className="pr-2">
-                                <button
-                                  className="rounded-l-full rounded-r-full bg-red-500 px-2 py-1"
-                                  onClick={() => handleRemoveButton(channel.id)}
-                                >
-                                  Remove
-                                </button>
-                              </td>
+                      {followedChannels.length > 0 ? (
+                        <table className="mr-2 table-auto border border-white">
+                          <thead>
+                            <tr>
+                              <th className="whitespace-nowrap py-4 pr-2 text-left">
+                                Profile Pic
+                              </th>
+                              <th className="whitespace-nowrap py-4 pr-2 text-left">
+                                Name
+                              </th>
+                              <th className="whitespace-nowrap py-4 pr-2 text-left">
+                                Id
+                              </th>
+                              <th className="whitespace-nowrap py-4 pr-2 text-left">
+                                Action
+                              </th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+
+                          <tbody>
+                            {followedChannels.map(
+                              (channel: ChromeStorageFollowedChannelsType) => (
+                                <tr
+                                  className="border border-white"
+                                  key={channel.id}
+                                >
+                                  <td className="pr-2">
+                                    <img
+                                      src={channel.profile_image_url}
+                                      alt={channel.display_name}
+                                      className="m-1 h-8 w-8 rounded-full"
+                                    />
+                                  </td>
+                                  <td className="pr-2">
+                                    <a
+                                      className="hover:border-b hover:border-[#a970ff]"
+                                      href={`https://twitch.tv/${channel.display_name}`}
+                                      target="_blank"
+                                    >
+                                      {channel.display_name}
+                                    </a>
+                                  </td>
+                                  <td className="pr-2">{channel.id}</td>
+                                  <td className="pr-2">
+                                    <button
+                                      className="rounded-l-full rounded-r-full bg-red-500 px-2 py-1"
+                                      onClick={() =>
+                                        handleRemoveButton(channel.id)
+                                      }
+                                    >
+                                      Remove
+                                    </button>
+                                  </td>
+                                </tr>
+                              ),
+                            )}
+                          </tbody>
+                        </table>
+                      ) : (
+                        <div className="border border-white p-2">
+                          <span>No Followed Channels</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
