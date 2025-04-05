@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.1.1 (04-04-2025)
+
+- Redesigned the layout of settings tab.
+- Fixed login button not asking user to login.
+- Added check for user not logged in and no streamer live.
+- Added clear all data button.
+- Fixed login button.
+- Added kofi link.
+
 ## 1.1.0 (26-03-2025)
 
 - Added stream title tooltip when hovering over streamer card.
