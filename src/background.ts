@@ -14,7 +14,6 @@ const fetchLiveFlow = async () => {
     console.log("followedChannels: ", followedChannels);
 
     let { accessToken } = await chrome.storage.local.get("accessToken");
-    console.log("accessToken local: ", accessToken);
 
     if (accessToken) {
       const tokenIsValid = await validateTwitchToken(accessToken);
@@ -58,4 +57,26 @@ chrome.alarms.create({ periodInMinutes: 1 });
 chrome.alarms.onAlarm.addListener((alarm) => {
   console.log("Alarm fired", alarm);
   fetchLiveFlow();
+});
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (
+    changeInfo.status === "complete" &&
+    tab.url &&
+    tab.url.startsWith("https://www.twitch.tv/") &&
+    !tab.url.includes("/videos")
+  ) {
+    console.log("Tab updated: ", tab);
+    chrome.scripting
+      .executeScript({
+        target: { tabId: tabId },
+        files: ["content.js"],
+      })
+      .then(() => {
+        console.log("Content script injected successfully");
+      })
+      .catch((error) => {
+        console.error("Error injecting content script: ", error);
+      });
+  }
 });
