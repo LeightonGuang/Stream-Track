@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import { TwitchBlackIcon } from "../../public/icons";
-import lookUpWTF from "../../public/assets/lookUpWTF.png";
-import getUserData from "../../utils/twitchApi/getUserData";
-import getStreamersLive from "../../utils/twitchApi/getStreamersLive";
-import getUserAccessToken from "../../utils/twitchApi/getUserAccessToken";
-import getFollowedChannels from "../../utils/twitchApi/getFollowedChannels";
-import getStreamersProfilePics from "../../utils/twitchApi/getStreamersProfilePics";
+import { TwitchBlackIcon } from "../../../public/icons";
+import lookUpWTF from "../../../public/assets/lookUpWTF.png";
+import getUserData from "../../../utils/twitchApi/getUserData";
+import getStreamersLive from "../../../utils/twitchApi/getStreamersLive";
+import getUserAccessToken from "../../../utils/twitchApi/getUserAccessToken";
+import getFollowedChannels from "../../../utils/twitchApi/getFollowedChannels";
+import getStreamersProfilePics from "../../../utils/twitchApi/getStreamersProfilePics";
 
-import { ManifestType } from "../../../types/manifestType";
-import { LocalSettingsType } from "../../../types/LocalSettingsType";
+import { ManifestType } from "../../../../types/manifestType";
+import { LocalSettingsType } from "../../../../types/LocalSettingsType";
 
 const SettingsTab = () => {
   const manifest = chrome.runtime.getManifest() as ManifestType;
@@ -254,6 +254,14 @@ const SettingsTab = () => {
             <span className="text-xs text-gray-500">v{version}</span>
 
             <img alt="emote" className="w-8 object-cover" src={lookUpWTF} />
+
+            <button
+              onClick={() => {
+                chrome.runtime.openOptionsPage();
+              }}
+            >
+              Option Page
+            </button>
           </div>
         </div>
       </div>

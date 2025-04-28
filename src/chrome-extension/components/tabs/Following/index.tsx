@@ -1,12 +1,12 @@
-import StreamerCard from "../StreamerCard";
+import StreamerCard from "../../StreamerCard";
 import { useState, useEffect } from "react";
-import { SortIcon } from "../../public/icons";
-import getStreamersLive from "../../utils/twitchApi/getStreamersLive";
-import getUserAccessToken from "../../utils/twitchApi/getUserAccessToken";
-import validateTwitchToken from "../../utils/twitchApi/validateTwitchToken";
+import { SortIcon } from "../../../public/icons";
+import getStreamersLive from "../../../utils/twitchApi/getStreamersLive";
+import getUserAccessToken from "../../../utils/twitchApi/getUserAccessToken";
+import validateTwitchToken from "../../../utils/twitchApi/validateTwitchToken";
 
-import { LiveChannelType } from "../../../types/liveChannelType";
-import { ChromeStorageFollowedChannelsType } from "../../../types/ChromeStorageFollowedChannelsType";
+import { LiveChannelType } from "../../../../types/liveChannelType";
+import { ChromeStorageFollowedChannelsType } from "../../../../types/ChromeStorageFollowedChannelsType";
 
 const FollowingTab = () => {
   // followedChannels is for streamers profile pictures
