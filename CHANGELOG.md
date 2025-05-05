@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.2.0 (05-05-2025)
+
+- Added content script to inject Split View button when it detects if any channel tags are in the stream title.
+  - The injected button opens [Twitch Split Viewer](https://twitchsplitviewer.netlify.app) and loads all the channels tagged in the stream title.
+
 ## 1.1.1 (04-04-2025)
 
 - Redesigned the layout of settings tab.
