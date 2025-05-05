@@ -1,7 +1,7 @@
 import "../global.css";
 import { useEffect, useState } from "react";
-import SettingsTab from "../components/settingsTab";
-import FollowingTab from "../components/FollowingTab";
+import SettingsTab from "../components/tabs/Settings";
+import FollowingTab from "../components/tabs/Following";
 
 import { ChromeStorageFollowedChannelsType } from "../../types/ChromeStorageFollowedChannelsType";
 

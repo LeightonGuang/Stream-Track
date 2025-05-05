@@ -1,8 +1,8 @@
 import "../global.css";
 import { useState } from "react";
-import SettingsTab from "../components/settingsTab";
-import FollowingTab from "../components/FollowingTab";
 import { TwitchPurpleIcon } from "../public/icons";
+import SettingsTab from "../components/tabs/Settings";
+import FollowingTab from "../components/tabs/Following";
 
 export const Popup = () => {
   const [selectedTab, setSelectedTab] = useState<"following" | "settings">(
