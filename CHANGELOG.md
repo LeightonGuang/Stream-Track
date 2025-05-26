@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.2.1 (26-05-2025)
+
+- Fixed issue with Split Viewer button not loading on initial load of the page.
+
 ## 1.2.0 (05-05-2025)
 
 - Added content script to inject Split View button when it detects if any channel tags are in the stream title.
