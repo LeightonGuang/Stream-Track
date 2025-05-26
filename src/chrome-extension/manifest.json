@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Stream Track - Track your favourite Twitch streamers",
   "description": "Track and stay updated on streaming activities of your favorite streamers.",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "action": {
     "default_popup": "popup.html"
   },
