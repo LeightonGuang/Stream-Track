@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { TwitchBlackIcon } from "../../../public/icons";
 import lookUpWTF from "../../../public/assets/lookUpWTF.png";
 import getUserData from "../../../utils/twitchApi/getUserData";
+import { RefreshIcon, TwitchBlackIcon } from "../../../public/icons";
 import getStreamersLive from "../../../utils/twitchApi/getStreamersLive";
 import getUserAccessToken from "../../../utils/twitchApi/getUserAccessToken";
 import getFollowedChannels from "../../../utils/twitchApi/getFollowedChannels";
@@ -163,10 +163,19 @@ const SettingsTab = () => {
             className="mt-2 flex w-max gap-1 rounded-lg bg-twitch px-2 py-1"
             onClick={handleTwitchLoginButton}
           >
-            <TwitchBlackIcon className="w-4" />
-            <span className="font-medium">
-              {userData ? "Update followed channels" : "Login with Twitch"}
-            </span>
+            {userData ? (
+              <>
+                <RefreshIcon className="w-4" />
+
+                <span className="font-medium">Refresh followed channels</span>
+              </>
+            ) : (
+              <>
+                <TwitchBlackIcon className="w-4" />
+
+                <span className="font-medium">Login with Twitch</span>
+              </>
+            )}
           </button>
 
           <div className="my-2 flex flex-col gap-2">
