@@ -31,13 +31,13 @@
       display: inline-block;
       background-color: #2a292e;
       color: #F3F3F1;
-      height: 30px;
-      margin-right: 10px;
-      border-radius: 4px;
+      height: 32px;
+      margin-right: 8px;
+      border-radius: 100rem;
       cursor: pointer;
-      padding: 0 8px;
+      padding: 0 12px;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 14px;
       line-height: 20px;
     `;
 
