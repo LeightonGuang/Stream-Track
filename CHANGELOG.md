@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.2.2 (04-09-2025)
+
+- Fixed scrollbar color to dark to improve visual consistency with the rest of the application.
+- Migrated hosting from Netlify to Cloudflare Pages.
+- Redesigned button to match Twitch's new design.
+
 ## 1.2.1 (26-05-2025)
 
 - Fixed issue with Split Viewer button not loading on initial load of the page.
