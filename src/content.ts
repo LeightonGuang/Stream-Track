@@ -57,7 +57,7 @@
     splitViewerButton.addEventListener("click", () => {
       const currentChannel = window.location.pathname.split("/")[1];
       window.open(
-        `https://twitchsplitviewer.netlify.app/?channels=${currentChannel},${channels.join(",")}`,
+        `https://twitchsplitviewer.pages.dev/?channels=${currentChannel},${channels.join(",")}`,
       );
     });
 
