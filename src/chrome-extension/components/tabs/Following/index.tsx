@@ -156,7 +156,7 @@ const FollowingTab = () => {
             </button>
           </div>
 
-          <div className="flex max-h-[calc(2.65rem*10)] flex-col overflow-y-auto overflow-x-hidden">
+          <div className="flex max-h-[calc(2.65rem*10)] flex-col overflow-y-auto overflow-x-hidden dark:[color-scheme:dark]">
             {sortedLiveChannels.map((liveChannelData: LiveChannelType) => {
               const channelData = followedChannels.find(
                 (channel) =>
